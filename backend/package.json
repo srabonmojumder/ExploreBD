@@ -11,7 +11,11 @@
     "lint": "tsc --noEmit",
     "db:server": "tsx src/scripts/start-pg-server.ts",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.17",

@@ -36,6 +36,7 @@ export async function startPgServer(port = 5432): Promise<EmbeddedPostgres | nul
     user: 'postgres',
     password: 'password',
     persistent: true,
+    initdbFlags: ['-E', 'UTF8', '--locale=C'],
   });
 
   const isAlreadyInit = fs.existsSync(path.join(dataDir, 'PG_VERSION'));
