@@ -26,6 +26,7 @@ export interface DistrictProgressStats {
 interface TravelStoreState {
   travelerName: string;
   visits: Record<string, PlaceVisitItem>; // keyed by placeSlug
+  manualVisitedDistricts: Record<string, boolean>; // keyed by districtSlug
   
   // Actions
   setTravelerName: (name: string) => void;
@@ -39,6 +40,8 @@ interface TravelStoreState {
   getTotalVisitedCount: () => number;
   getTotalVisitsCount: () => number;
   getVisitedDistrictSlugs: () => string[];
+  toggleDistrictVisit: (districtSlug: string) => void;
+  isDistrictVisited: (districtSlug: string) => boolean;
   clearDistrictVisits: (districtSlug: string) => void;
   clearAllVisits: () => void;
 }
@@ -67,6 +70,7 @@ export const useTravelStore = create<TravelStoreState>()(
     (set, get) => ({
       travelerName: 'ভ্রমণপিপাসু',
       visits: {},
+      manualVisitedDistricts: {},
 
       setTravelerName: (name: string) => {
         set({ travelerName: name.trim() || 'ভ্রমণপিপাসু' });
@@ -169,28 +173,60 @@ export const useTravelStore = create<TravelStoreState>()(
         return Object.values(get().visits).reduce((acc, v) => acc + v.count, 0);
       },
 
+      isDistrictVisited: (districtSlug: string) => {
+        if (get().manualVisitedDistricts[districtSlug]) return true;
+        return Object.values(get().visits).some(
+          (v) => v.districtSlug === districtSlug && v.count > 0
+        );
+      },
+
+      toggleDistrictVisit: (districtSlug: string) => {
+        set((state) => {
+          const isCurrentlyVisited = get().isDistrictVisited(districtSlug);
+          const nextManual = { ...state.manualVisitedDistricts };
+
+          if (isCurrentlyVisited) {
+            nextManual[districtSlug] = false;
+            // Also clear spot visits for this district if untoggling
+            const nextVisits = { ...state.visits };
+            Object.entries(nextVisits).forEach(([k, v]) => {
+              if (v.districtSlug === districtSlug) delete nextVisits[k];
+            });
+            return { manualVisitedDistricts: nextManual, visits: nextVisits };
+          } else {
+            nextManual[districtSlug] = true;
+            return { manualVisitedDistricts: nextManual };
+          }
+        });
+      },
+
       getVisitedDistrictSlugs: () => {
         const districts = new Set<string>();
         Object.values(get().visits).forEach((v) => {
-          if (v.districtSlug) districts.add(v.districtSlug);
+          if (v.districtSlug && v.count > 0) districts.add(v.districtSlug);
+        });
+        Object.entries(get().manualVisitedDistricts).forEach(([slug, isVisited]) => {
+          if (isVisited) districts.add(slug);
         });
         return Array.from(districts);
       },
 
       clearDistrictVisits: (districtSlug: string) => {
         set((state) => {
-          const next: Record<string, PlaceVisitItem> = {};
+          const nextVisits: Record<string, PlaceVisitItem> = {};
           Object.entries(state.visits).forEach(([k, v]) => {
             if (v.districtSlug !== districtSlug) {
-              next[k] = v;
+              nextVisits[k] = v;
             }
           });
-          return { visits: next };
+          const nextManual = { ...state.manualVisitedDistricts };
+          delete nextManual[districtSlug];
+          return { visits: nextVisits, manualVisitedDistricts: nextManual };
         });
       },
 
       clearAllVisits: () => {
-        set({ visits: {} });
+        set({ visits: {}, manualVisitedDistricts: {} });
       },
     }),
     {

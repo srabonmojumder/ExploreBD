@@ -6,6 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import { ApiClient } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
 import { useMounted } from '@/hooks/useMounted';
+import { BangladeshInteractiveMap } from '@/components/map/BangladeshInteractiveMap';
+import { NationalMapShareModal } from '@/components/map/NationalMapShareModal';
 import {
   Compass,
   MapPin,
@@ -47,6 +49,7 @@ export default function TravelTrackerPage() {
   const [selectedDivision, setSelectedDivision] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [nameInput, setNameInput] = useState('অভিযাত্রী');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     if (mounted) {
@@ -103,22 +106,33 @@ export default function TravelTrackerPage() {
               গিয়েছেন এবং <strong>কত বার গিয়েছেন</strong>, তা ট্র্যাক করুন ও শেয়ার করুন নিজের ভ্রমণ খতিয়ান!
             </p>
 
-            {/* Custom Name Field */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-md">
-              <label className="text-xs text-slate-400 font-semibold whitespace-nowrap">
-                আপনার নাম:
-              </label>
-              <input
-                type="text"
-                value={nameInput}
-                onChange={(e) => {
-                  setNameInput(e.target.value);
-                  setTravelerName(e.target.value);
-                }}
-                placeholder="আপনার নাম লিখুন..."
-                className="px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 flex-1"
-                maxLength={25}
-              />
+            {/* Custom Name Field & Share Button */}
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="flex items-center gap-2.5 flex-1">
+                <label className="text-xs text-slate-400 font-semibold whitespace-nowrap">
+                  আপনার নাম:
+                </label>
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => {
+                    setNameInput(e.target.value);
+                    setTravelerName(e.target.value);
+                  }}
+                  placeholder="আপনার নাম লিখুন..."
+                  className="px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 w-full"
+                  maxLength={25}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shrink-0"
+              >
+                <Share2 className="w-4 h-4 text-emerald-200" />
+                <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার</span>
+              </button>
             </div>
           </div>
 
@@ -165,7 +179,35 @@ export default function TravelTrackerPage() {
         </div>
       </section>
 
-      {/* 2. District Filter Bar */}
+      {/* 2. Interactive SVG Map of Bangladesh */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+              <Compass className="w-5 h-5 text-emerald-400" />
+              <span>ইন্টারেক্টিভ বাংলাদেশ ভ্রমণ মানচিত্র</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+              যে জেলাগুলোতে আপনি ভ্রমণ করেছেন তা ম্যাপে সবুজ রঙে হাইলাইট হবে। যে কোনো জেলায় ক্লিক করে সরাসরি ঘুরেছি চিহ্নিত করুন।
+            </p>
+          </div>
+
+          <button
+            onClick={() => setIsShareModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold text-xs flex items-center gap-2 transition-all shrink-0 self-start sm:self-auto"
+          >
+            <Share2 className="w-4 h-4 text-emerald-400" />
+            <span>ম্যাপ কার্ড ডাউনলোড (PNG)</span>
+          </button>
+        </div>
+
+        <BangladeshInteractiveMap
+          districts={districts}
+          onOpenShareModal={() => setIsShareModalOpen(true)}
+        />
+      </section>
+
+      {/* 3. District Filter Bar */}
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           {/* Division Pills */}
@@ -293,6 +335,13 @@ export default function TravelTrackerPage() {
           })}
         </div>
       )}
+
+      {/* 4. National Share Card Modal */}
+      <NationalMapShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        districts={districts}
+      />
     </div>
   );
 }
