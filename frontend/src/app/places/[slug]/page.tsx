@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ApiClient } from '@/lib/api-client';
 import { CategoryBadge } from '@/components/places/CategoryBadge';
 import { PlaceCard } from '@/components/places/PlaceCard';
+import { useTravelStore } from '@/stores/useTravelStore';
 import {
   MapPin,
   ChevronRight,
@@ -21,6 +22,9 @@ import {
   Sparkles,
   Camera,
   Share2,
+  Check,
+  Plus,
+  Minus,
 } from 'lucide-react';
 
 export default function PlaceDetailPage({
@@ -32,6 +36,7 @@ export default function PlaceDetailPage({
   const slug = resolvedParams.slug;
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const { getPlaceVisit, incrementVisit, decrementVisit } = useTravelStore();
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['place-detail', slug],
@@ -39,6 +44,9 @@ export default function PlaceDetailPage({
   });
 
   const place = data?.data;
+  const visit = place ? getPlaceVisit(place.slug) : undefined;
+  const visitCount = visit ? visit.count : 0;
+  const isVisited = visitCount > 0;
 
   const allImages = place
     ? [
@@ -137,7 +145,7 @@ export default function PlaceDetailPage({
               </h1>
             </div>
 
-            {/* Quick Actions (Add Visit ready for Phase 4) */}
+            {/* Quick Actions (Add Visit & Share) */}
             <div className="flex items-center gap-3 shrink-0">
               <button
                 type="button"
@@ -151,13 +159,60 @@ export default function PlaceDetailPage({
                 <Share2 className="w-5 h-5" />
               </button>
 
-              <button
-                type="button"
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm shadow-xl shadow-emerald-950/60 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>Log Visit</span>
-              </button>
+              {isVisited ? (
+                <div className="flex items-center gap-2 bg-slate-900 border border-emerald-500/40 rounded-xl p-1.5 shadow-lg shadow-emerald-950/40">
+                  <button
+                    type="button"
+                    onClick={() => decrementVisit(place.slug)}
+                    className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-red-950/60 hover:text-red-300 text-slate-300 flex items-center justify-center transition-colors text-sm font-bold"
+                    title="কমাও"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+
+                  <div className="px-2 text-center">
+                    <span className="text-xs font-bold text-emerald-400">
+                      ✓ {visitCount} বার ভ্রমণ
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      incrementVisit({
+                        placeId: place.id,
+                        placeSlug: place.slug,
+                        placeName: place.name,
+                        bnName: place.bnName,
+                        districtSlug: place.district?.slug || '',
+                        category: place.category,
+                      })
+                    }
+                    className="w-8 h-8 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center transition-colors text-sm font-bold"
+                    title="আরো ১ বার বাড়াও"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    incrementVisit({
+                      placeId: place.id,
+                      placeSlug: place.slug,
+                      placeName: place.name,
+                      bnName: place.bnName,
+                      districtSlug: place.district?.slug || '',
+                      category: place.category,
+                    })
+                  }
+                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm shadow-xl shadow-emerald-950/60 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>ঘুরেছি? লগ করুন</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -253,25 +308,52 @@ export default function PlaceDetailPage({
                 </div>
               </div>
 
-              {/* Visit History Section (Travel tracking placeholder for Phase 4) */}
+              {/* Visit History Section */}
               <div className="glass-card p-6 sm:p-8 rounded-2xl border border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-emerald-400" />
-                    <span>Your Visit History</span>
+                    <span>আপনার ভ্রমণ ইতিহাস</span>
                   </h3>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-slate-900 text-slate-400 border border-white/10">
-                    0 visits recorded
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full border ${
+                      isVisited
+                        ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30 font-semibold'
+                        : 'bg-slate-900 text-slate-400 border-white/10'
+                    }`}
+                  >
+                    {isVisited ? `${visitCount} বার ঘুরেছেন` : 'এখনো ভ্রমণ করেননি'}
                   </span>
                 </div>
-                <div className="py-8 border border-dashed border-white/10 rounded-xl text-center space-y-2 bg-slate-900/30">
-                  <p className="text-sm font-medium text-slate-300">
-                    You haven&apos;t marked your visit to {place.name} yet.
-                  </p>
-                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                    Click &ldquo;Log Visit&rdquo; to add your visit date, rating, photos, and personal memories.
-                  </p>
-                </div>
+
+                {isVisited ? (
+                  <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/20 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-900/60 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold text-sm">
+                        {visitCount}x
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white">
+                          আপনি {place.bnName || place.name}-এ মোট {visitCount} বার ভ্রমণ করেছেন!
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {visit?.lastVisited
+                            ? `সর্বশেষ আপডেট: ${new Date(visit.lastVisited).toLocaleDateString()}`
+                            : 'লোকাল ট্র্যাকিং সক্রিয়'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-8 border border-dashed border-white/10 rounded-xl text-center space-y-2 bg-slate-900/30">
+                    <p className="text-sm font-medium text-slate-300">
+                      আপনি এখনো {place.bnName || place.name}-এ যাওয়ার রেকর্ড যোগ করেননি।
+                    </p>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                      উপরে &ldquo;ঘুরেছি? লগ করুন&rdquo; বাটনে ক্লিক করে সহজেই আপনার ভ্রমণ সংখ্যা যোগ করতে পারবেন।
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

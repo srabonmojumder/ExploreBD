@@ -51,20 +51,20 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
-              href="/districts"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95"
+              href="/tracker"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95"
             >
               <Compass className="w-4 h-4" />
-              <span>Explore 64 Districts</span>
+              <span>আমার ভ্রমণ ট্র্যাকার (ম্যাপ ও কার্ড)</span>
               <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
 
             <Link
-              href="/places"
+              href="/districts"
               className="w-full sm:w-auto px-7 py-3.5 rounded-xl glass-card hover:bg-slate-800 text-slate-200 font-semibold text-sm border border-white/10 flex items-center justify-center gap-2 transition-all"
             >
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>Browse Places</span>
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span>৬৪ জেলা অন্বেষণ</span>
             </Link>
           </div>
 

@@ -9,10 +9,10 @@ export function Navbar() {
   const { isMobileMenuOpen, toggleMobileMenu, setMobileMenuOpen } = useAppStore();
 
   const navLinks = [
+    { name: 'ভ্রমণ ট্র্যাকার', href: '/tracker', icon: Globe2 },
     { name: 'Places', href: '/places', icon: Compass },
     { name: 'Districts (64)', href: '/districts', icon: MapPin },
     { name: 'Divisions', href: '/#divisions', icon: Layers },
-    { name: 'Leaderboard', href: '/#leaderboard', icon: Trophy },
   ];
 
   return (

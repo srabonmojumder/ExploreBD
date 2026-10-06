@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient, PlaceCategory } from '@/lib/api-client';
-import { PlaceCard } from '@/components/places/PlaceCard';
+import { useTravelStore } from '@/stores/useTravelStore';
+import { DistrictSpotTracker } from '@/components/districts/DistrictSpotTracker';
 import {
   MapPin,
   ChevronRight,
@@ -27,7 +28,7 @@ export default function DistrictDetailPage({
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const { getDistrictStats } = useTravelStore();
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['district-detail', slug],
@@ -35,15 +36,7 @@ export default function DistrictDetailPage({
   });
 
   const district = data?.data;
-
-  const filteredPlaces =
-    district?.places.filter((p) =>
-      selectedCategory === 'ALL' ? true : p.category === selectedCategory
-    ) || [];
-
-  const availableCategories = Array.from(
-    new Set(district?.places.map((p) => p.category) || [])
-  );
+  const userStats = district ? getDistrictStats(district.slug, district.places.length) : null;
 
   return (
     <div className="space-y-12 pb-20">
@@ -138,128 +131,43 @@ export default function DistrictDetailPage({
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                      <span>District Progress</span>
+                      <span>{userStats?.levelBadge || '🏆'} আপনার প্রগ্রেস</span>
                     </span>
                     <span className="text-xs font-bold text-emerald-400">
-                      {district.stats.explorationPercentage}% Explored
+                      {userStats ? userStats.percentage : 0}% সম্পন্ন
                     </span>
                   </div>
 
                   <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-white/5">
                     <div
                       className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${district.stats.explorationPercentage}%` }}
+                      style={{ width: `${userStats ? userStats.percentage : 0}%` }}
                     />
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-slate-300">
                     <span>
-                      <strong className="text-white">{district.stats.exploredPlaces}</strong> /{' '}
-                      {district.stats.totalPlaces} Places Explored
+                      <strong className="text-white">{userStats ? userStats.visitedPlaces : 0}</strong> /{' '}
+                      {district.places.length} স্থান ঘুরেছেন
                     </span>
                     <span className="text-slate-500">•</span>
-                    <span className="text-emerald-400 font-medium">Ready to track</span>
+                    <span className="text-amber-300 font-semibold">
+                      {userStats ? userStats.totalVisits : 0} বার ভ্রমণ
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* District Places Grid Container */}
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            {/* Filter Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <Compass className="w-5 h-5 text-emerald-400" />
-                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  Tourist Destinations in {district.name}
-                </h2>
-                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-500/20">
-                  {district.places.length}
-                </span>
-              </div>
-
-              {/* Category Filter Pills */}
-              {availableCategories.length > 0 && (
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategory('ALL')}
-                    className={`px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                      selectedCategory === 'ALL'
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/60 ring-1 ring-emerald-400'
-                        : 'glass-card text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    All ({district.places.length})
-                  </button>
-                  {availableCategories.map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap capitalize transition-all ${
-                        selectedCategory === cat
-                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/60 ring-1 ring-emerald-400'
-                          : 'glass-card text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      {cat.toLowerCase()}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Places Grid */}
-            {filteredPlaces.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPlaces.map((place) => (
-                  <PlaceCard key={place.id} place={place} />
-                ))}
-              </div>
-            ) : (
-              <div className="py-16 glass-card rounded-2xl p-8 text-center space-y-3">
-                <Compass className="w-10 h-10 text-slate-500 mx-auto" />
-                <h3 className="font-bold text-white text-lg">
-                  No places listed in this category
-                </h3>
-                <p className="text-sm text-slate-400 max-w-sm mx-auto">
-                  Select another category or view all places in {district.name}.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategory('ALL')}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold"
-                >
-                  View All Places
-                </button>
-              </div>
-            )}
-
-            {/* User Visited Places Section (Empty state preview for travel tracking) */}
-            <section className="glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span>Your Visited Places in {district.name}</span>
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                    Keep a personal record of every waterfall, park, and hill you visit in this district.
-                  </p>
-                </div>
-              </div>
-
-              <div className="py-8 border border-dashed border-white/10 rounded-xl text-center space-y-2 bg-slate-900/30">
-                <p className="text-sm font-medium text-slate-300">
-                  No visits logged in {district.name} yet.
-                </p>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Once you visit destinations here, your dates, ratings, and memories will appear in this section.
-                </p>
-              </div>
-            </section>
+          {/* District Places & Micro-Spot Tracker */}
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <DistrictSpotTracker
+              districtName={district.name}
+              districtBnName={district.bnName}
+              districtSlug={district.slug}
+              places={district.places}
+            />
           </main>
         </>
       )}

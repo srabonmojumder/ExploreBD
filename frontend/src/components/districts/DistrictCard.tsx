@@ -2,13 +2,18 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { District } from '@/lib/api-client';
-import { MapPin, Navigation, Compass } from 'lucide-react';
+import { useTravelStore } from '@/stores/useTravelStore';
+import { MapPin, Navigation, Compass, CheckCircle2, Sparkles } from 'lucide-react';
 
 interface DistrictCardProps {
   district: District;
 }
 
 export function DistrictCard({ district }: DistrictCardProps) {
+  const { getDistrictStats } = useTravelStore();
+  const totalPlaces = district._count?.places ?? 0;
+  const userStats = getDistrictStats(district.slug, totalPlaces);
+  const hasVisits = userStats.visitedPlaces > 0;
   const coverUrl =
     district.coverImage ||
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
@@ -67,13 +72,22 @@ export function DistrictCard({ district }: DistrictCardProps) {
 
         {/* Exploration Status Preview */}
         <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
-          <span className="flex items-center gap-1.5 text-slate-400">
-            <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Exploration</span>
-          </span>
+          {hasVisits ? (
+            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span>
+                {userStats.visitedPlaces} স্থান • {userStats.totalVisits} বার
+              </span>
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-slate-400">
+              <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+              <span>অদেখা জেলা</span>
+            </span>
+          )}
 
           <span className="text-emerald-400 font-semibold group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
-            <span>Explore District</span>
+            <span>ট্র্যাক করুন</span>
             <Navigation className="w-3 h-3" />
           </span>
         </div>
