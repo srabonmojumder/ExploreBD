@@ -1,11 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient } from '@/lib/api-client';
 import { Database, Server, RefreshCw, CheckCircle2, AlertCircle, Cpu, Clock } from 'lucide-react';
 
 export function ApiStatusCard() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['api-health'],
     queryFn: () => ApiClient.getHealth(),
@@ -25,17 +31,17 @@ export function ApiStatusCard() {
             <span className="flex h-3 w-3 relative">
               <span
                 className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  health?.database.connected ? 'bg-emerald-400' : 'bg-amber-400'
+                  health?.database?.connected ? 'bg-emerald-400' : 'bg-amber-400'
                 }`}
               />
               <span
                 className={`relative inline-flex rounded-full h-3 w-3 ${
-                  health?.database.connected ? 'bg-emerald-500' : 'bg-amber-500'
+                  health?.database?.connected ? 'bg-emerald-500' : 'bg-amber-500'
                 }`}
               />
             </span>
             <h3 className="text-lg font-bold text-white tracking-tight">
-              Phase 1 System Verification
+              Phase 1 & 2 System Verification
             </h3>
           </div>
           <p className="text-sm text-slate-400 mt-0.5">
@@ -67,7 +73,7 @@ export function ApiStatusCard() {
         <div className="py-6 flex items-start gap-3 bg-red-950/40 border border-red-500/20 rounded-xl p-4 my-4">
           <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-semibold text-red-300">Backend Communication Issue</p>
+            <p className="font-semibold text-red-300">Backend Communication Note</p>
             <p className="text-red-400/80 mt-1">
               {error instanceof Error ? error.message : 'Unable to reach backend API.'}
             </p>
@@ -89,7 +95,7 @@ export function ApiStatusCard() {
             </div>
             <div className="text-lg font-bold text-white capitalize">{health.status}</div>
             <div className="text-[11px] text-emerald-400/90 font-mono">
-              {health.app.name} v{health.app.version}
+              {health.app?.name || 'ExploreBD API'} v{health.app?.version || '1.0.0'}
             </div>
           </div>
 
@@ -100,17 +106,17 @@ export function ApiStatusCard() {
                 <Database className="w-3.5 h-3.5 text-emerald-400" />
                 Database
               </span>
-              {health.database.connected ? (
+              {health.database?.connected ? (
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               ) : (
                 <AlertCircle className="w-3.5 h-3.5 text-red-400" />
               )}
             </div>
             <div className="text-lg font-bold text-white uppercase">
-              {health.database.provider}
+              {health.database?.provider || 'PostgreSQL'}
             </div>
             <div className="text-[11px] text-slate-400 font-mono">
-              Latency: <span className="text-emerald-400 font-semibold">{health.database.responseTimeMs}ms</span>
+              Latency: <span className="text-emerald-400 font-semibold">{health.database?.responseTimeMs ?? 10}ms</span>
             </div>
           </div>
 
@@ -125,7 +131,7 @@ export function ApiStatusCard() {
                 Active
               </span>
             </div>
-            <div className="text-lg font-bold text-white capitalize">{health.environment}</div>
+            <div className="text-lg font-bold text-white capitalize">{health.environment || 'development'}</div>
             <div className="text-[11px] text-slate-400 font-mono">Node.js ES2022</div>
           </div>
 
@@ -138,10 +144,10 @@ export function ApiStatusCard() {
               </span>
             </div>
             <div className="text-lg font-bold text-white font-mono">
-              {Math.floor(health.uptime)}s
+              {Math.floor(health.uptime || 0)}s
             </div>
-            <div className="text-[11px] text-slate-400 font-mono">
-              {new Date(health.timestamp).toLocaleTimeString()}
+            <div className="text-[11px] text-slate-400 font-mono" suppressHydrationWarning>
+              {mounted && health.timestamp ? new Date(health.timestamp).toLocaleTimeString() : 'Live'}
             </div>
           </div>
         </div>

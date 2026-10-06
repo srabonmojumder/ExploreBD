@@ -23,7 +23,7 @@ export default function HomePage() {
     queryFn: () => ApiClient.getPlaces({ sortBy: 'popular', limit: 6 }),
   });
 
-  const popularPlaces = popularData?.data || [];
+  const popularPlaces = Array.isArray(popularData?.data) ? popularData.data : [];
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-20">

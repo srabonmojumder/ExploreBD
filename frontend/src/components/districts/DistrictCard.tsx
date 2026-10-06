@@ -32,7 +32,7 @@ export function DistrictCard({ district }: DistrictCardProps) {
         {/* Division Badge */}
         <div className="absolute top-3 left-3">
           <span className="px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-xs font-semibold text-emerald-300">
-            {district.division.name}
+            {district.division?.name || 'Bangladesh'}
           </span>
         </div>
 
@@ -40,7 +40,7 @@ export function DistrictCard({ district }: DistrictCardProps) {
         <div className="absolute top-3 right-3">
           <span className="px-2.5 py-1 rounded-full bg-emerald-950/80 backdrop-blur-md border border-emerald-500/20 text-xs font-medium text-emerald-400 flex items-center gap-1">
             <Compass className="w-3 h-3" />
-            <span>{district._count.places} Places</span>
+            <span>{district._count?.places ?? 0} Places</span>
           </span>
         </div>
 
