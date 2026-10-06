@@ -1,0 +1,21 @@
+{
+  "name": "explorebd",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ExploreBD — Bangladesh Travel Exploration Platform",
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend",
+    "db:server": "npm run db:server --workspace=backend",
+    "db:push": "npm run db:push --workspace=backend",
+    "db:generate": "npm run db:generate --workspace=backend"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
