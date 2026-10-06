@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient, PlaceCategory } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 import { DistrictSpotTracker } from '@/components/districts/DistrictSpotTracker';
 import {
   MapPin,
@@ -27,6 +28,7 @@ export default function DistrictDetailPage({
 }) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
+  const mounted = useMounted();
 
   const { getDistrictStats } = useTravelStore();
 
@@ -36,7 +38,7 @@ export default function DistrictDetailPage({
   });
 
   const district = data?.data;
-  const userStats = district ? getDistrictStats(district.slug, district.places.length) : null;
+  const userStats = district && mounted ? getDistrictStats(district.slug, district.places.length) : null;
 
   return (
     <div className="space-y-12 pb-20">

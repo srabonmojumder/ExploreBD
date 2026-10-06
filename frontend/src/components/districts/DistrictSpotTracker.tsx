@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Place } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 import { DistrictSpotTrackerCard } from './DistrictSpotTrackerCard';
 import { DistrictShareCardModal } from './DistrictShareCardModal';
 import {
@@ -29,17 +30,31 @@ export function DistrictSpotTracker({
   districtSlug,
   places,
 }: DistrictSpotTrackerProps) {
+  const mounted = useMounted();
   const { getDistrictStats, getPlaceVisit, clearDistrictVisits } = useTravelStore();
 
   const [activeTab, setActiveTab] = useState<'ALL' | 'VISITED' | 'UNVISITED'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const stats = getDistrictStats(districtSlug, places.length);
+  const defaultStats = {
+    totalPlaces: places.length,
+    visitedPlaces: 0,
+    totalVisits: 0,
+    percentage: 0,
+    levelTitle: 'ভ্রমণ শুরুর অপেক্ষায়',
+    levelBadge: '🌱',
+  };
+  const stats = mounted ? getDistrictStats(districtSlug, places.length) : defaultStats;
   const displayName = districtBnName || districtName;
 
   // Filter places based on activeTab and category
   const filteredPlaces = places.filter((place) => {
+    if (!mounted) {
+      if (activeTab === 'VISITED') return false;
+      if (selectedCategory !== 'ALL' && place.category !== selectedCategory) return false;
+      return true;
+    }
     const visit = getPlaceVisit(place.slug);
     const isVisited = Boolean(visit && visit.count > 0);
 

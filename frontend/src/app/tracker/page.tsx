@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 import {
   Compass,
   MapPin,
@@ -33,6 +34,7 @@ const DIVISIONS = [
 ];
 
 export default function TravelTrackerPage() {
+  const mounted = useMounted();
   const {
     travelerName,
     setTravelerName,
@@ -44,7 +46,13 @@ export default function TravelTrackerPage() {
 
   const [selectedDivision, setSelectedDivision] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [nameInput, setNameInput] = useState(travelerName);
+  const [nameInput, setNameInput] = useState('অভিযাত্রী');
+
+  useEffect(() => {
+    if (mounted) {
+      setNameInput(travelerName);
+    }
+  }, [mounted, travelerName]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['tracker-districts'],
@@ -52,9 +60,9 @@ export default function TravelTrackerPage() {
   });
 
   const districts = data?.data || [];
-  const visitedDistrictSlugs = getVisitedDistrictSlugs();
-  const totalVisitedPlaces = getTotalVisitedCount();
-  const totalVisitsCount = getTotalVisitsCount();
+  const visitedDistrictSlugs = mounted ? getVisitedDistrictSlugs() : [];
+  const totalVisitedPlaces = mounted ? getTotalVisitedCount() : 0;
+  const totalVisitsCount = mounted ? getTotalVisitsCount() : 0;
   const visitedDistrictCount = visitedDistrictSlugs.length;
   const nationalPercentage = Math.round((visitedDistrictCount / 64) * 100);
 

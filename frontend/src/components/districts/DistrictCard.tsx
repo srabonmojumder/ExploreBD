@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { District } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 import { MapPin, Navigation, Compass, CheckCircle2, Sparkles } from 'lucide-react';
 
 interface DistrictCardProps {
@@ -10,10 +13,11 @@ interface DistrictCardProps {
 }
 
 export function DistrictCard({ district }: DistrictCardProps) {
+  const mounted = useMounted();
   const { getDistrictStats } = useTravelStore();
   const totalPlaces = district._count?.places ?? 0;
-  const userStats = getDistrictStats(district.slug, totalPlaces);
-  const hasVisits = userStats.visitedPlaces > 0;
+  const userStats = mounted ? getDistrictStats(district.slug, totalPlaces) : null;
+  const hasVisits = Boolean(userStats && userStats.visitedPlaces > 0);
   const coverUrl =
     district.coverImage ||
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
@@ -72,7 +76,7 @@ export function DistrictCard({ district }: DistrictCardProps) {
 
         {/* Exploration Status Preview */}
         <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
-          {hasVisits ? (
+          {hasVisits && userStats ? (
             <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
               <span>

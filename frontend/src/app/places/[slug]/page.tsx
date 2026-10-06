@@ -8,6 +8,7 @@ import { ApiClient } from '@/lib/api-client';
 import { CategoryBadge } from '@/components/places/CategoryBadge';
 import { PlaceCard } from '@/components/places/PlaceCard';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 import {
   MapPin,
   ChevronRight,
@@ -34,6 +35,7 @@ export default function PlaceDetailPage({
 }) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
+  const mounted = useMounted();
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { getPlaceVisit, incrementVisit, decrementVisit } = useTravelStore();
@@ -44,7 +46,7 @@ export default function PlaceDetailPage({
   });
 
   const place = data?.data;
-  const visit = place ? getPlaceVisit(place.slug) : undefined;
+  const visit = place && mounted ? getPlaceVisit(place.slug) : undefined;
   const visitCount = visit ? visit.count : 0;
   const isVisited = visitCount > 0;
 

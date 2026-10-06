@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Place } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 import { CategoryBadge } from '@/components/places/CategoryBadge';
 import { Check, Plus, Minus, MapPin, Eye, Sparkles } from 'lucide-react';
 
@@ -17,9 +18,10 @@ export function DistrictSpotTrackerCard({
   place,
   districtSlug,
 }: DistrictSpotTrackerCardProps) {
+  const mounted = useMounted();
   const { getPlaceVisit, incrementVisit, decrementVisit, recordVisit } = useTravelStore();
 
-  const visit = getPlaceVisit(place.slug);
+  const visit = mounted ? getPlaceVisit(place.slug) : undefined;
   const isVisited = Boolean(visit && visit.count > 0);
   const visitCount = visit ? visit.count : 0;
 
