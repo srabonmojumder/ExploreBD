@@ -24,6 +24,7 @@ export function createApp() {
           'http://127.0.0.1:3000',
           'https://explorebd.vercel.app',
           'https://explore-bd-gamma.vercel.app',
+          'https://explorebangladesh.vercel.app',
         ];
         if (
           allowedOrigins.includes(requestOrigin) ||
