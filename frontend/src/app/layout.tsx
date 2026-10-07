@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Hind_Siliguri } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/lib/query-provider';
@@ -18,6 +18,13 @@ const hindSiliguri = Hind_Siliguri({
   variable: '--font-bengali',
   display: 'swap',
 });
+
+export const viewport: Viewport = {
+  themeColor: '#020617',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
