@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://explorebd.vercel.app'),
   title: 'ExploreBD — Bangladesh Travel Exploration Platform',
   description:
     'Discover, track, and share your journeys across all 8 Divisions and 64 Districts of Bangladesh. Collect achievements, view interactive maps, and compete on the national leaderboard.',

@@ -13,10 +13,25 @@ export function createApp() {
   // Security headers
   app.use(helmet());
 
-  // CORS configuration
+  // CORS configuration (supports local, production domain, and Vercel previews)
   app.use(
     cors({
-      origin: [config.clientUrl, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+      origin: (requestOrigin, callback) => {
+        if (!requestOrigin) return callback(null, true);
+        const allowedOrigins = [
+          config.clientUrl,
+          'http://localhost:3000',
+          'http://127.0.0.1:3000',
+          'https://explorebd.vercel.app',
+        ];
+        if (
+          allowedOrigins.includes(requestOrigin) ||
+          requestOrigin.endsWith('.vercel.app')
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, false);
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
