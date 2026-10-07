@@ -14,6 +14,11 @@ pnpm-debug.log*
 data/
 backend/data/
 backend/data/pgdata/
+backups/
+backend/backups/
+*.dump
+*.sql.bak
+*.json.bak
 .prisma/
 *.tsbuildinfo
 

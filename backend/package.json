@@ -12,6 +12,7 @@
     "db:server": "tsx src/scripts/start-pg-server.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
+    "db:backup": "tsx src/scripts/backup-database.ts",
     "seed": "tsx prisma/seed.ts"
   },
   "prisma": {
