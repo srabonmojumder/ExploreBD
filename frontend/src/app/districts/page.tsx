@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient } from '@/lib/api-client';
 import { DistrictCard } from '@/components/districts/DistrictCard';
 import { SearchInput } from '@/components/shared/SearchInput';
-import { MapPin, RefreshCw, AlertCircle, Layers } from 'lucide-react';
+import { MapPin, RefreshCw, AlertCircle, Layers, Sparkles } from 'lucide-react';
 
 const DIVISIONS = [
   { label: 'All Divisions', slug: '' },
@@ -19,9 +20,18 @@ const DIVISIONS = [
   { label: 'Mymensingh', slug: 'mymensingh' },
 ];
 
-export default function DistrictsPage() {
-  const [selectedDivision, setSelectedDivision] = useState('');
+function DistrictsContent() {
+  const searchParams = useSearchParams();
+  const divisionParam = searchParams.get('division') || '';
+
+  const [selectedDivision, setSelectedDivision] = useState(divisionParam);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (divisionParam) {
+      setSelectedDivision(divisionParam);
+    }
+  }, [divisionParam]);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['districts', selectedDivision, searchQuery],
@@ -139,5 +149,20 @@ export default function DistrictsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DistrictsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-24 flex flex-col items-center justify-center space-y-3">
+          <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin" />
+          <p className="text-sm text-slate-400">Loading districts...</p>
+        </div>
+      }
+    >
+      <DistrictsContent />
+    </Suspense>
   );
 }

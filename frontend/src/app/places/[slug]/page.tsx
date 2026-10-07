@@ -38,6 +38,8 @@ export default function PlaceDetailPage({
   const mounted = useMounted();
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [imageErrorMap, setImageErrorMap] = useState<Record<string, boolean>>({});
   const { getPlaceVisit, incrementVisit, decrementVisit } = useTravelStore();
 
   const { data, isLoading, isError, error, refetch } = useQuery({
@@ -153,12 +155,23 @@ export default function PlaceDetailPage({
                 type="button"
                 onClick={() => {
                   navigator.clipboard?.writeText(window.location.href);
-                  alert('Destination link copied to clipboard!');
+                  setIsLinkCopied(true);
+                  setTimeout(() => setIsLinkCopied(false), 2200);
                 }}
-                className="p-3 rounded-xl glass-card hover:bg-slate-800 text-slate-300 hover:text-white transition-colors"
-                title="Share place"
+                className="px-3.5 py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
+                title="Share destination"
               >
-                <Share2 className="w-5 h-5" />
+                {isLinkCopied ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
+                    <span className="text-xs font-bold text-emerald-300">কপি হয়েছে!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" />
+                    <span className="text-xs font-medium hidden sm:inline">শেয়ার করুন</span>
+                  </>
+                )}
               </button>
 
               {isVisited ? (
@@ -223,11 +236,14 @@ export default function PlaceDetailPage({
             {/* Primary Featured Image */}
             <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full rounded-2xl overflow-hidden bg-slate-900 border border-white/10 shadow-2xl">
               <Image
-                src={activeImage}
+                src={imageErrorMap[activeImage] ? '/banner.jpg' : activeImage}
                 alt={place.name}
                 fill
                 priority
                 className="object-cover transition-all duration-500"
+                onError={() =>
+                  setImageErrorMap((prev) => ({ ...prev, [activeImage]: true }))
+                }
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
 
@@ -265,7 +281,15 @@ export default function PlaceDetailPage({
                         : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <Image src={img} alt="Thumbnail" fill className="object-cover" />
+                    <Image
+                      src={imageErrorMap[img] ? '/banner.jpg' : img}
+                      alt="Thumbnail"
+                      fill
+                      className="object-cover"
+                      onError={() =>
+                        setImageErrorMap((prev) => ({ ...prev, [img]: true }))
+                      }
+                    />
                   </button>
                 ))}
               </div>
@@ -436,30 +460,7 @@ export default function PlaceDetailPage({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
                 {place.recommended.map((rec) => (
-                  <Link
-                    key={rec.id}
-                    href={`/places/${rec.slug}`}
-                    className="glass-card rounded-2xl overflow-hidden group hover:border-emerald-500/40 transition-all hover:-translate-y-1"
-                  >
-                    <div className="relative aspect-[16/10] w-full bg-slate-900">
-                      <Image
-                        src={
-                          rec.coverImage ||
-                          rec.images?.[0]?.url ||
-                          'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'
-                        }
-                        alt={rec.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4 space-y-1">
-                      <h4 className="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors line-clamp-1">
-                        {rec.name}
-                      </h4>
-                      <p className="text-xs text-slate-400">{rec.district.name}</p>
-                    </div>
-                  </Link>
+                  <RecommendedCard key={rec.id} rec={rec} />
                 ))}
               </div>
             </section>
@@ -469,3 +470,35 @@ export default function PlaceDetailPage({
     </div>
   );
 }
+
+function RecommendedCard({ rec }: { rec: any }) {
+  const initialImg =
+    rec.coverImage ||
+    rec.images?.[0]?.url ||
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80';
+  const [imgSrc, setImgSrc] = useState(initialImg);
+
+  return (
+    <Link
+      href={`/places/${rec.slug}`}
+      className="glass-card rounded-2xl overflow-hidden group hover:border-emerald-500/40 transition-all hover:-translate-y-1"
+    >
+      <div className="relative aspect-[16/10] w-full bg-slate-900">
+        <Image
+          src={imgSrc}
+          alt={rec.name}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          onError={() => setImgSrc('/banner.jpg')}
+        />
+      </div>
+      <div className="p-4 space-y-1">
+        <h4 className="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors line-clamp-1">
+          {rec.name}
+        </h4>
+        <p className="text-xs text-slate-400">{rec.district?.name || 'Bangladesh'}</p>
+      </div>
+    </Link>
+  );
+}
+

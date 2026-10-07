@@ -80,7 +80,7 @@ export default function DistrictDetailPage({
       {district && (
         <>
           {/* Hero Section */}
-          <section className="relative h-[420px] sm:h-[480px] w-full overflow-hidden bg-slate-950">
+          <section className="relative min-h-[440px] sm:min-h-[480px] w-full overflow-hidden bg-slate-950 flex flex-col justify-end pt-12 pb-8 sm:pb-10">
             <Image
               src={
                 district.coverImage ||
@@ -93,7 +93,7 @@ export default function DistrictDetailPage({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
 
-            <div className="relative max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-10 space-y-4">
+            <div className="relative max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-4">
               {/* Breadcrumbs */}
               <nav className="flex items-center gap-2 text-xs font-medium text-slate-300">
                 <Link href="/" className="hover:text-emerald-400 transition-colors">

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient, PlaceCategory } from '@/lib/api-client';
 import { PlaceCard } from '@/components/places/PlaceCard';
@@ -21,10 +22,19 @@ const CATEGORIES: Array<{ label: string; value: string }> = [
   { label: 'Park', value: 'PARK' },
 ];
 
-export default function PlacesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+function PlacesContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category')?.toUpperCase() || '';
+
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('rating');
+
+  useEffect(() => {
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+  }, [categoryParam]);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['places', selectedCategory, searchQuery, sortBy],
@@ -157,5 +167,20 @@ export default function PlacesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PlacesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-24 flex flex-col items-center justify-center space-y-3">
+          <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin" />
+          <p className="text-sm text-slate-400">Loading destinations...</p>
+        </div>
+      }
+    >
+      <PlacesContent />
+    </Suspense>
   );
 }

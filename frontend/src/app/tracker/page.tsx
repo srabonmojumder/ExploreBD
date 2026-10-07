@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
-import { ApiClient } from '@/lib/api-client';
+import { ApiClient, District } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
 import { useMounted } from '@/hooks/useMounted';
 import { BangladeshInteractiveMap } from '@/components/map/BangladeshInteractiveMap';
@@ -259,78 +260,13 @@ export default function TravelTrackerPage() {
             const isVisited = stats.visitedPlaces > 0;
 
             return (
-              <Link
+              <TrackerDistrictCard
                 key={district.id}
-                href={`/districts/${district.slug}`}
-                className={`group flex flex-col rounded-2xl glass-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border ${
-                  isVisited
-                    ? 'border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-400 shadow-emerald-950/40'
-                    : 'border-white/10 hover:border-white/20'
-                }`}
-              >
-                {/* District Header Card */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <h3 className="font-bold text-lg text-white group-hover:text-emerald-300 transition-colors">
-                          {district.bnName || district.name}
-                        </h3>
-                        {district.bnName && (
-                          <span className="text-[11px] text-slate-400 font-medium">
-                            {district.name}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs text-slate-500 mt-0.5 block">
-                        {district.division?.name} বিভাগ
-                      </span>
-                    </div>
-
-                    {isVisited ? (
-                      <div className="px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-xs shrink-0 flex items-center gap-1 shadow-md shadow-emerald-950/60">
-                        <CheckCircle2 className="w-3 h-3 stroke-[3]" />
-                        <span>ঘুরেছি</span>
-                      </div>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400 shrink-0">
-                        অদেখা
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Progress Stats */}
-                  <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">
-                        {isVisited
-                          ? `${stats.visitedPlaces}টি স্পট ঘুরেছেন`
-                          : `${totalPlaces}টি স্পট তালিকাভুক্ত`}
-                      </span>
-                      {isVisited && (
-                        <span className="text-amber-300 font-bold">
-                          {stats.totalVisits} বার
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-white/5">
-                      <div
-                        className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-300"
-                        style={{ width: `${stats.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Footer Action */}
-                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-400 group-hover:text-emerald-400 transition-colors">
-                    <span className="font-semibold text-[11px]">
-                      স্পট ও ভিজিট মার্ক করুন
-                    </span>
-                    <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Link>
+                district={district}
+                stats={stats}
+                isVisited={isVisited}
+                totalPlaces={totalPlaces}
+              />
             );
           })}
         </div>
@@ -345,3 +281,114 @@ export default function TravelTrackerPage() {
     </div>
   );
 }
+
+function TrackerDistrictCard({
+  district,
+  stats,
+  isVisited,
+  totalPlaces,
+}: {
+  district: District;
+  stats: { visitedPlaces: number; totalVisits: number; percentage: number };
+  isVisited: boolean;
+  totalPlaces: number;
+}) {
+  const initialCover =
+    district.coverImage ||
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
+  const [imgSrc, setImgSrc] = useState(initialCover);
+
+  return (
+    <Link
+      href={`/districts/${district.slug}`}
+      className={`group flex flex-col rounded-2xl glass-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border ${
+        isVisited
+          ? 'border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-400 shadow-emerald-950/40'
+          : 'border-white/10 hover:border-white/20'
+      }`}
+    >
+      {/* Cover Image Container */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
+        <Image
+          src={imgSrc}
+          alt={district.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={() => setImgSrc('/banner.jpg')}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+
+        {/* Division Badge */}
+        <div className="absolute top-3 left-3">
+          <span className="px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-emerald-300">
+            {district.division?.name || 'বাংলাদেশ'} বিভাগ
+          </span>
+        </div>
+
+        {/* Status / Spot Count */}
+        <div className="absolute top-3 right-3">
+          {isVisited ? (
+            <div className="px-2.5 py-1 rounded-full bg-emerald-500 text-slate-950 font-black text-xs shrink-0 flex items-center gap-1 shadow-md shadow-emerald-950/60">
+              <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />
+              <span>ঘুরেছি</span>
+            </div>
+          ) : (
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-950/80 backdrop-blur-md text-slate-300 border border-white/10 shrink-0">
+              {totalPlaces}টি স্পট
+            </span>
+          )}
+        </div>
+
+        {/* Title over image bottom */}
+        <div className="absolute bottom-3 left-3 right-3">
+          <div className="flex items-baseline justify-between">
+            <h3 className="font-bold text-lg text-white group-hover:text-emerald-300 transition-colors">
+              {district.bnName || district.name}
+            </h3>
+            {district.bnName && (
+              <span className="text-xs text-slate-300 font-medium">
+                {district.name}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* District Progress & Action */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
+        {/* Progress Stats */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-400">
+              {isVisited
+                ? `${stats.visitedPlaces}টি স্পট ঘুরেছেন`
+                : `${totalPlaces}টি দর্শনীয় স্থান`}
+            </span>
+            {isVisited && (
+              <span className="text-amber-300 font-bold">
+                {stats.totalVisits} বার
+              </span>
+            )}
+          </div>
+
+          <div className="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-white/5">
+            <div
+              className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-300"
+              style={{ width: `${stats.percentage}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Footer Action */}
+        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-400 group-hover:text-emerald-400 transition-colors">
+          <span className="font-semibold text-[11px]">
+            স্পট ও ভ্রমণ লগ দেখুন
+          </span>
+          <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
