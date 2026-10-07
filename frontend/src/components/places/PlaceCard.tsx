@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Place } from '@/lib/api-client';
@@ -10,10 +12,11 @@ interface PlaceCardProps {
 }
 
 export function PlaceCard({ place }: PlaceCardProps) {
-  const coverUrl =
+  const initialCover =
     place?.coverImage ||
     place?.images?.[0]?.url ||
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
+  const [imgSrc, setImgSrc] = useState(initialCover);
 
   const rating =
     typeof place?.averageRating === 'number'
@@ -36,11 +39,12 @@ export function PlaceCard({ place }: PlaceCardProps) {
       {/* Cover Image Container */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
         <Image
-          src={coverUrl}
+          src={imgSrc}
           alt={place?.name || 'Tourist Place'}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={() => setImgSrc('/banner.jpg')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
 

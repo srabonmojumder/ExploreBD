@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { District } from '@/lib/api-client';
@@ -18,9 +18,10 @@ export function DistrictCard({ district }: DistrictCardProps) {
   const totalPlaces = district._count?.places ?? 0;
   const userStats = mounted ? getDistrictStats(district.slug, totalPlaces) : null;
   const hasVisits = Boolean(userStats && userStats.visitedPlaces > 0);
-  const coverUrl =
+  const initialCover =
     district.coverImage ||
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
+  const [imgSrc, setImgSrc] = useState(initialCover);
 
   return (
     <Link
@@ -30,11 +31,12 @@ export function DistrictCard({ district }: DistrictCardProps) {
       {/* Cover Image Container */}
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-900">
         <Image
-          src={coverUrl}
+          src={imgSrc}
           alt={district.name}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={() => setImgSrc('/banner.jpg')}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
 
