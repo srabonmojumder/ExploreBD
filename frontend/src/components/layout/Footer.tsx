@@ -16,8 +16,25 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-white/10 bg-slate-950/80 text-slate-400 mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="relative overflow-hidden border-t border-white/10 bg-slate-950 text-slate-400 mt-20">
+      {/* Ambient Background Video */}
+      <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover object-center opacity-30 filter brightness-90 contrast-110"
+        >
+          <source src="/video/footer_globe.mp4" type="video/mp4" />
+        </video>
+        {/* Cinematic Gradient Overlays for Pristine Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/75 to-slate-950/95" />
+        <div className="absolute inset-0 bg-emerald-950/10 mix-blend-screen" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}
           <div className="space-y-4">
