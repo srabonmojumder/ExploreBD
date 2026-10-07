@@ -297,11 +297,17 @@ export function Footer() {
 
             {/* Facebook Profile Banner Card */}
             <div className="rounded-2xl bg-slate-900/90 border border-white/15 overflow-hidden shadow-2xl group transition-all duration-300 hover:border-blue-500/40">
-              {/* Facebook Cover Photo Banner */}
-              <div className="relative h-20 w-full overflow-hidden bg-slate-800">
+              {/* Facebook Cover Photo Banner (Links to Official Facebook Page) */}
+              <a
+                href="https://www.facebook.com/profile.php?id=61594934441480"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative h-20 w-full overflow-hidden bg-slate-800 block cursor-pointer"
+                title="ExploreBD অফিসিয়াল ফেসবুক পেজে যান"
+              >
                 <Image
                   src="/cover.jpg"
-                  alt="ExploreBD Facebook Cover"
+                  alt="ExploreBD Official Facebook Page Cover"
                   fill
                   sizes="(max-width: 768px) 100vw, 320px"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -309,15 +315,21 @@ export function Footer() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-black/40" />
                 <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-blue-600/90 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 shadow">
                   <Facebook className="w-3 h-3" />
-                  <span>Facebook</span>
+                  <span>ExploreBD Page</span>
                 </div>
-              </div>
+              </a>
 
               {/* Profile Avatar & Info Body */}
               <div className="px-3.5 pb-3.5 pt-0 relative">
-                {/* Overlapping Profile Avatar */}
+                {/* Overlapping Profile Avatar (Links to Personal Account) */}
                 <div className="flex items-end justify-between -mt-7 mb-2">
-                  <div className="relative w-14 h-14 rounded-full border-2 border-slate-900 overflow-hidden bg-slate-950 shadow-xl ring-2 ring-blue-500/70">
+                  <a
+                    href="https://www.facebook.com/sraabonmozumder/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative w-14 h-14 rounded-full border-2 border-slate-900 overflow-hidden bg-slate-950 shadow-xl ring-2 ring-blue-500/70 hover:ring-blue-400 block transition-all flex-shrink-0"
+                    title="শ্রাবণ মজুমদার এর ব্যক্তিগত প্রোফাইল"
+                  >
                     <Image
                       src="/logo.jpg"
                       alt="Srabon Mozumder Profile Avatar"
@@ -325,7 +337,7 @@ export function Footer() {
                       sizes="56px"
                       className="object-cover"
                     />
-                  </div>
+                  </a>
                   <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Active Creator</span>
@@ -335,14 +347,28 @@ export function Footer() {
                 {/* Name, Verified Badge & Bio */}
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-black text-white tracking-tight">শ্রাবণ মজুমদার</span>
-                    <div className="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white" title="Verified Creator">
+                    <a
+                      href="https://www.facebook.com/sraabonmozumder/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-black text-white hover:text-blue-400 tracking-tight transition-colors"
+                    >
+                      শ্রাবণ মজুমদার
+                    </a>
+                    <div className="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Creator">
                       <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
                         <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="text-[11px] text-blue-400 font-semibold">@sraabonmozumder</p>
+                  <a
+                    href="https://www.facebook.com/sraabonmozumder/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-blue-400 hover:underline font-semibold block"
+                  >
+                    @sraabonmozumder
+                  </a>
                   <p className="text-[10px] text-slate-300 leading-snug pt-0.5">
                     Founder & Developer, ExploreBD 🇧🇩
                   </p>
@@ -350,24 +376,37 @@ export function Footer() {
 
                 {/* Social Connect Buttons */}
                 <div className="space-y-1.5 pt-3">
+                  {/* Official Facebook Page Button */}
                   <a
-                    href="https://www.facebook.com/sraabonmozumder"
+                    href="https://www.facebook.com/profile.php?id=61594934441480"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-950/60 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-950/60 transition-colors"
                   >
                     <Facebook className="w-3.5 h-3.5" />
-                    <span>Facebook Profile</span>
+                    <span>ExploreBD অফিসিয়াল পেজ</span>
                   </a>
 
+                  {/* Personal Facebook Profile Button */}
+                  <a
+                    href="https://www.facebook.com/sraabonmozumder/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg btn-glitch bg-slate-800/90 hover:bg-slate-700/90 border border-white/10 text-slate-200 text-xs font-semibold transition-colors"
+                  >
+                    <Facebook className="w-3.5 h-3.5 text-blue-400" />
+                    <span>ব্যক্তিগত ফেসবুক প্রোফাইল</span>
+                  </a>
+
+                  {/* WhatsApp Direct Message Button */}
                   <a
                     href="https://wa.me/8801827621312"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-colors"
                   >
                     <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>WhatsApp মেসেজ</span>
+                    <span>WhatsApp: 01827621312</span>
                   </a>
                 </div>
               </div>
