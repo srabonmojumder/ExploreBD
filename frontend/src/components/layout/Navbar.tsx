@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Compass, MapPin, Trophy, Layers, Menu, X, Globe2 } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 
@@ -18,19 +19,25 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 shadow-lg shadow-emerald-950/40 group-hover:scale-105 transition-transform">
-              <Compass className="w-5 h-5 text-white animate-spin-slow group-hover:rotate-45 transition-transform" />
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-600 border-2 border-slate-950" />
+          <Link href="/" className="flex items-center gap-3.5 group">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-emerald-500/50 shadow-xl shadow-emerald-950/60 group-hover:scale-105 group-hover:border-emerald-400 transition-all bg-slate-900 flex-shrink-0">
+              <Image
+                src="/logo.jpg"
+                alt="ExploreBD Logo"
+                fill
+                sizes="(max-width: 640px) 52px, 64px"
+                className="object-cover"
+                priority
+              />
             </div>
             <div>
-              <div className="flex items-center gap-1.5 font-bold text-xl tracking-tight text-white">
+              <div className="flex items-center gap-1.5 font-black text-2xl sm:text-3xl tracking-tight text-white leading-none">
                 <span>Explore</span>
-                <span className="text-emerald-400">BD</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">BD</span>
               </div>
-              <p className="text-[10px] text-slate-400 tracking-wider uppercase font-medium">
+              <p className="text-[11px] sm:text-xs text-slate-300/80 tracking-wider uppercase font-semibold mt-1">
                 Bangladesh Travel Platform
               </p>
             </div>
@@ -57,7 +64,7 @@ export function Navbar() {
           <div className="hidden sm:flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-500/20 text-xs font-medium text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Phase 1 Live</span>
+              <span>Bangladesh Live 🇧🇩</span>
             </div>
 
             <button

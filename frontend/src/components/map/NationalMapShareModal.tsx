@@ -209,16 +209,21 @@ export function NationalMapShareModal({
 
             {/* Card Brand Header */}
             <div className="relative z-10 flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center font-black text-slate-950 text-xs">
-                  BD
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-emerald-400/60 shadow-lg shadow-emerald-950/60 flex-shrink-0 bg-slate-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/logo.jpg"
+                    alt="ExploreBD Logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
-                  <div className="font-extrabold text-sm tracking-tight text-white flex items-center gap-1">
+                  <div className="font-black text-base tracking-tight text-white flex items-center gap-1">
                     <span>Explore</span>
                     <span className="text-emerald-400">BD</span>
                   </div>
-                  <div className="text-[9px] text-slate-400 tracking-wider uppercase font-medium">
+                  <div className="text-[10px] text-slate-300 tracking-wider uppercase font-semibold">
                     Travel Map Log
                   </div>
                 </div>

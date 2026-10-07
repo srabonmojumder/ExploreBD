@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { ApiClient } from '@/lib/api-client';
 import { PlaceCard } from '@/components/places/PlaceCard';
@@ -86,6 +87,23 @@ export default function HomePage() {
               <div className="text-2xl sm:text-3xl font-extrabold text-teal-300">100+</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider font-medium">
                 Destinations
+              </div>
+            </div>
+          </div>
+
+          {/* Hero ExploreBD Brand Banner Showcase */}
+          <div className="pt-8 max-w-4xl mx-auto">
+            <div className="relative rounded-3xl overflow-hidden border border-emerald-500/20 shadow-2xl shadow-emerald-950/60 group">
+              <div className="relative aspect-[16/9] w-full">
+                <Image
+                  src="/banner.jpg"
+                  alt="Explore Bangladesh - Discover the Beauty of Bangladesh"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 896px"
+                  className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
               </div>
             </div>
           </div>

@@ -41,7 +41,7 @@ export function ApiStatusCard() {
               />
             </span>
             <h3 className="text-lg font-bold text-white tracking-tight">
-              Phase 1 & 2 System Verification
+              Live System Verification
             </h3>
           </div>
           <p className="text-sm text-slate-400 mt-0.5">

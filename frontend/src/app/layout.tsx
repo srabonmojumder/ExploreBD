@@ -19,11 +19,24 @@ export const metadata: Metadata = {
     'Bangladesh Tourism',
   ],
   authors: [{ name: 'ExploreBD Team' }],
+  icons: {
+    icon: '/logo.jpg',
+    shortcut: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
   openGraph: {
     title: 'ExploreBD — Bangladesh Travel Exploration Platform',
     description:
       'Track your journeys across 64 districts and 8 divisions of Bangladesh. Gamified travel tracking with interactive maps.',
     siteName: 'ExploreBD',
+    images: [
+      {
+        url: '/banner.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'ExploreBD Bangladesh Travel Platform',
+      },
+    ],
     locale: 'en_US',
     type: 'website',
   },
