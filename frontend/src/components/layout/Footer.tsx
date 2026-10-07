@@ -299,15 +299,15 @@ export function Footer() {
                 {/* Large, Clearly Visible Overlapping Avatar (72px / w-18) */}
                 <div className="flex items-end justify-between -mt-9 mb-2.5">
                   <a
-                    href="https://www.facebook.com/sraabonmozumder/"
+                    href="https://www.facebook.com/profile.php?id=61594934441480"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border-3 border-slate-900 overflow-hidden bg-slate-950 shadow-2xl ring-2 ring-blue-500/80 hover:ring-blue-400 block transition-all flex-shrink-0"
-                    title="শ্রাবণ মজুমদার এর ব্যক্তিগত প্রোফাইল"
+                    title="ExploreBD অফিসিয়াল ফেসবুক পেজ"
                   >
                     <Image
                       src="/logo.jpg"
-                      alt="Srabon Mozumder Profile Avatar"
+                      alt="ExploreBD Official Logo"
                       fill
                       sizes="80px"
                       className="object-cover"
@@ -315,37 +315,41 @@ export function Footer() {
                   </a>
                   <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-full shadow">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Active Creator</span>
+                    <span>অফিসিয়াল পেজ</span>
                   </div>
                 </div>
 
-                {/* Name, Verified Badge & Bio */}
+                {/* Page Name, Verified Badge & Founder Info */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <a
-                      href="https://www.facebook.com/sraabonmozumder/"
+                      href="https://www.facebook.com/profile.php?id=61594934441480"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-base sm:text-lg font-black text-white hover:text-blue-400 tracking-tight transition-colors"
                     >
-                      শ্রাবণ মজুমদার
+                      ExploreBD
                     </a>
-                    <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Creator">
+                    <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Official Page">
                       <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
                         <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                       </svg>
                     </div>
                   </div>
-                  <a
-                    href="https://www.facebook.com/sraabonmozumder/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs sm:text-sm text-blue-400 hover:underline font-semibold block"
-                  >
-                    @sraabonmozumder
-                  </a>
+                  <p className="text-xs sm:text-sm text-emerald-400 font-bold block">
+                    অফিসিয়াল ফেসবুক পেজ
+                  </p>
                   <p className="text-xs sm:text-sm text-slate-300 leading-snug pt-0.5">
-                    Founder & Developer, ExploreBD 🇧🇩
+                    প্রতিষ্ঠাতা ও ডেভেলপার:{" "}
+                    <a
+                      href="https://www.facebook.com/sraabonmozumder/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white hover:text-blue-400 font-semibold underline decoration-dotted transition-colors"
+                    >
+                      শ্রাবণ মজুমদার
+                    </a>{" "}
+                    🇧🇩
                   </p>
                 </div>
 
@@ -370,7 +374,7 @@ export function Footer() {
                     className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-slate-800/90 hover:bg-slate-700/90 border border-white/10 text-slate-200 text-xs sm:text-sm font-semibold transition-colors"
                   >
                     <Facebook className="w-4 h-4 text-blue-400" />
-                    <span>ব্যক্তিগত ফেসবুক প্রোফাইল</span>
+                    <span>শ্রাবণ মজুমদার (ব্যক্তিগত প্রোফাইল)</span>
                   </a>
 
                   {/* WhatsApp Direct Message Button */}
