@@ -3,11 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Compass, MapPin, Trophy, Layers, Menu, X, Globe2 } from 'lucide-react';
+import { Compass, MapPin, Layers, Menu, X, Globe2, Sparkles, Navigation } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
+import { useTravelStore } from '@/stores/useTravelStore';
+import { useMounted } from '@/hooks/useMounted';
 
 export function Navbar() {
+  const mounted = useMounted();
   const { isMobileMenuOpen, toggleMobileMenu, setMobileMenuOpen } = useAppStore();
+  const { getVisitedDistrictSlugs } = useTravelStore();
+
+  const visitedCount = mounted ? getVisitedDistrictSlugs().length : 0;
 
   const navLinks = [
     { name: 'ভ্রমণ ট্র্যাকার', href: '/tracker', icon: Globe2 },
@@ -60,25 +66,27 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Actions & Live Status Indicator */}
+          {/* Actions & Live Progress Badge */}
           <div className="hidden sm:flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-500/20 text-xs font-medium text-emerald-400">
+            <Link
+              href="/tracker"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300 transition-all hover:scale-105"
+            >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Bangladesh Live 🇧🇩</span>
-            </div>
+              {visitedCount > 0 ? (
+                <span>{visitedCount}/৬৪ জেলা সম্পন্ন ✨</span>
+              ) : (
+                <span>বাংলাদেশ লাইভ 🇧🇩</span>
+              )}
+            </Link>
 
-            <button
-              type="button"
-              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+            <Link
+              href="/tracker"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-sm font-bold text-white shadow-lg shadow-emerald-950/60 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
             >
-              Sign In
-            </button>
-            <button
-              type="button"
-              className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold text-white shadow-md shadow-emerald-900/30 hover:shadow-emerald-700/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Start Exploring
-            </button>
+              <Compass className="w-4 h-4" />
+              <span>অন্বেষণ শুরু করুন</span>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -115,18 +123,22 @@ export function Navbar() {
             })}
           </nav>
           <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
-            <button
-              type="button"
-              className="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-semibold text-sm"
+            <Link
+              href="/tracker"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/60"
             >
-              Start Exploring
-            </button>
-            <button
-              type="button"
-              className="w-full py-2.5 rounded-lg bg-slate-800 text-slate-200 text-sm font-medium"
+              <Compass className="w-4 h-4" />
+              <span>অন্বেষণ শুরু করুন (ভ্রমণ ট্র্যাকার)</span>
+            </Link>
+            <Link
+              href="/districts"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-2.5 rounded-xl bg-slate-900 border border-white/10 text-slate-200 hover:text-white text-sm font-semibold flex items-center justify-center gap-2"
             >
-              Sign In
-            </button>
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span>৬৪ জেলা ব্রাউজ করুন</span>
+            </Link>
           </div>
         </div>
       )}
