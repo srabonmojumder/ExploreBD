@@ -268,84 +268,80 @@ export function Footer() {
               <span>কমিউনিটি ও ডেভেলপার</span>
             </h4>
 
-            {/* Prominent Facebook Profile & Cover Showcase Card */}
-            <div className="rounded-2xl bg-slate-900/95 border border-white/20 overflow-hidden shadow-2xl group transition-all duration-300 hover:border-blue-500/50">
-              {/* Clearly Visible Facebook Cover Photo Banner (120px tall, clear lighting) */}
+            {/* Compact & Elegant Facebook Page Showcase Card */}
+            <div className="rounded-xl bg-slate-900/95 border border-white/20 overflow-hidden shadow-xl group transition-all duration-300 hover:border-blue-500/50">
+              {/* Facebook Cover Photo Banner (Compact 80px-88px height) */}
               <a
                 href="https://www.facebook.com/profile.php?id=61594934441480"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-800 block cursor-pointer"
+                className="relative h-20 sm:h-22 w-full overflow-hidden bg-slate-800 block cursor-pointer"
                 title="ExploreBD অফিসিয়াল ফেসবুক পেজে যান"
               >
                 <Image
                   src="/cover.jpg"
                   alt="ExploreBD Official Facebook Page Cover"
                   fill
-                  sizes="(max-width: 768px) 100vw, 360px"
+                  sizes="(max-width: 768px) 100vw, 320px"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   priority
                 />
-                {/* Clean soft shadow so the cover image is 100% visible */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-black/20" />
-                <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-blue-600 backdrop-blur-md text-xs font-bold text-white flex items-center gap-1.5 shadow-lg border border-blue-400/30">
-                  <Facebook className="w-3.5 h-3.5 fill-current" />
-                  <span>ExploreBD Page</span>
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-blue-600/90 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 shadow border border-blue-400/30">
+                  <Facebook className="w-3 h-3 fill-current" />
+                  <span>পেজ</span>
                 </div>
               </a>
 
               {/* Profile Avatar & Info Body */}
-              <div className="px-4 pb-4 pt-0 relative">
-                {/* Large, Clearly Visible Overlapping Avatar (72px / w-18) */}
-                <div className="flex items-end justify-between -mt-9 mb-2.5">
+              <div className="px-3.5 pb-3.5 pt-0 relative">
+                {/* Compact Overlapping Avatar */}
+                <div className="flex items-end justify-between -mt-7 mb-2">
                   <a
                     href="https://www.facebook.com/profile.php?id=61594934441480"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border-3 border-slate-900 overflow-hidden bg-slate-950 shadow-2xl ring-2 ring-blue-500/80 hover:ring-blue-400 block transition-all flex-shrink-0"
+                    className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-slate-900 overflow-hidden bg-slate-950 shadow-xl ring-2 ring-blue-500/80 hover:ring-blue-400 block transition-all flex-shrink-0"
                     title="ExploreBD অফিসিয়াল ফেসবুক পেজ"
                   >
                     <Image
                       src="/logo.jpg"
                       alt="ExploreBD Official Logo"
                       fill
-                      sizes="80px"
+                      sizes="64px"
                       className="object-cover"
                     />
                   </a>
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-full shadow">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-semibold bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full shadow">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>অফিসিয়াল পেজ</span>
                   </div>
                 </div>
 
                 {/* Page Name, Verified Badge & Founder Info */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1.5">
                     <a
                       href="https://www.facebook.com/profile.php?id=61594934441480"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-base sm:text-lg font-black text-white hover:text-blue-400 tracking-tight transition-colors"
+                      className="text-base font-black text-white hover:text-blue-400 tracking-tight transition-colors"
                     >
                       ExploreBD
                     </a>
-                    <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Official Page">
-                      <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
+                    <div className="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Official Page">
+                      <svg className="w-2 h-2 fill-current" viewBox="0 0 20 20">
                         <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                       </svg>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-emerald-400 font-bold block">
-                    অফিসিয়াল ফেসবুক পেজ
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-snug pt-0.5">
+                  <p className="text-[11px] sm:text-xs text-slate-300 leading-snug">
                     প্রতিষ্ঠাতা ও ডেভেলপার:{" "}
                     <a
                       href="https://www.facebook.com/sraabonmozumder/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white hover:text-blue-400 font-semibold underline decoration-dotted transition-colors"
+                      className="text-white hover:text-blue-400 font-medium underline decoration-dotted transition-colors"
                     >
                       শ্রাবণ মজুমদার
                     </a>{" "}
@@ -353,28 +349,17 @@ export function Footer() {
                   </p>
                 </div>
 
-                {/* Social Connect Buttons (Clear, Comfortable Size) */}
-                <div className="space-y-2 pt-3.5">
+                {/* Social Connect Buttons (Only 2 compact buttons: Official Page & WhatsApp) */}
+                <div className="space-y-2 pt-2.5">
                   {/* Official Facebook Page Button */}
                   <a
                     href="https://www.facebook.com/profile.php?id=61594934441480"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg btn-glitch bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-950/60 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-950/40 transition-colors"
                   >
-                    <Facebook className="w-4 h-4" />
+                    <Facebook className="w-3.5 h-3.5" />
                     <span>ExploreBD অফিসিয়াল পেজ</span>
-                  </a>
-
-                  {/* Personal Facebook Profile Button */}
-                  <a
-                    href="https://www.facebook.com/sraabonmozumder/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-slate-800/90 hover:bg-slate-700/90 border border-white/10 text-slate-200 text-xs sm:text-sm font-semibold transition-colors"
-                  >
-                    <Facebook className="w-4 h-4 text-blue-400" />
-                    <span>শ্রাবণ মজুমদার (ব্যক্তিগত প্রোফাইল)</span>
                   </a>
 
                   {/* WhatsApp Direct Message Button */}
@@ -382,9 +367,9 @@ export function Footer() {
                     href="https://wa.me/8801827621312"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-semibold transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg btn-glitch bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-colors"
                   >
-                    <MessageCircle className="w-4 h-4 text-emerald-400" />
+                    <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
                     <span>WhatsApp: 01827621312</span>
                   </a>
                 </div>
