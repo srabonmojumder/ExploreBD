@@ -125,7 +125,7 @@ npm run db:backup --workspace=backend
 
 ## 📖 In-Depth Documentation Files
 
-For complete deep-dive documentation in both English and Banglish/Bengali, see:
+- [Master Project Walkthrough & Onboarding Guide](file:///c:/Users/user/Documents/project/ExploreBD/PROJECT_WALKTHROUGH.md) ⭐
 - [Backend Architecture Guide (English)](file:///c:/Users/user/Documents/project/ExploreBD/backend/ARCHITECTURE_EN.md)
 - [Backend Architecture Guide (Banglish/Bengali)](file:///c:/Users/user/Documents/project/ExploreBD/backend/ARCHITECTURE_BN.md)
 - [Frontend Architecture Guide (English)](file:///c:/Users/user/Documents/project/ExploreBD/frontend/ARCHITECTURE_EN.md)
