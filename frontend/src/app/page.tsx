@@ -16,9 +16,34 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 
 export default function HomePage() {
+  const [isPlaying, setIsPlaying] = React.useState(true);
+  const [isMuted, setIsMuted] = React.useState(true);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
   const { data: popularData, isLoading: loadingPopular } = useQuery({
     queryKey: ['popular-places-home'],
     queryFn: () => ApiClient.getPlaces({ sortBy: 'popular', limit: 6 }),
@@ -91,19 +116,58 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Hero ExploreBD Brand Banner Showcase */}
+          {/* Hero ExploreBD Brand Video Showcase */}
           <div className="pt-8 max-w-4xl mx-auto">
-            <div className="relative rounded-3xl overflow-hidden border border-emerald-500/20 shadow-2xl shadow-emerald-950/60 group">
-              <div className="relative aspect-[16/9] w-full">
-                <Image
-                  src="/banner.jpg"
-                  alt="Explore Bangladesh - Discover the Beauty of Bangladesh"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 896px"
-                  className="object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
-                  priority
+            <div className="relative rounded-3xl overflow-hidden border border-emerald-500/30 shadow-2xl shadow-emerald-950/80 group bg-slate-950">
+              <div className="relative aspect-[16/9] w-full overflow-hidden">
+                <video
+                  ref={videoRef}
+                  src="/video/gemini_generated_video_95780bdf.mp4"
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                  className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+                {/* Subtle gradient overlays for depth */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30 pointer-events-none" />
+
+                {/* Top Badge & Interactive Audio/Play Controls */}
+                <div className="absolute top-3.5 left-3.5 sm:top-4 sm:left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-emerald-500/30 text-xs font-semibold text-emerald-300 shadow-lg pointer-events-auto">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>ExploreBD Cinematic Tour</span>
+                </div>
+
+                <div className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 flex items-center gap-2 pointer-events-auto">
+                  <button
+                    type="button"
+                    onClick={togglePlay}
+                    className="p-2 sm:p-2.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white hover:text-emerald-400 hover:border-emerald-500/40 transition-colors shadow-lg"
+                    title={isPlaying ? 'Pause' : 'Play'}
+                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                  >
+                    {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    className="p-2 sm:p-2.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white hover:text-emerald-400 hover:border-emerald-500/40 transition-colors shadow-lg"
+                    title={isMuted ? 'Unmute' : 'Mute'}
+                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                  >
+                    {isMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-300" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+                  </button>
+                </div>
+
+                {/* Bottom info banner */}
+                <div className="absolute bottom-3.5 left-3.5 right-3.5 sm:bottom-4 sm:left-4 sm:right-4 flex items-center justify-between text-xs text-slate-300 pointer-events-none">
+                  <span className="font-semibold text-white drop-shadow text-xs sm:text-sm">
+                    ৬৪ জেলার ডিজিটাল রূপরেখা ও ভ্রমণ দৃশ্য 🇧🇩
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-medium text-emerald-400">
+                    HD Cinematic
+                  </span>
+                </div>
               </div>
             </div>
           </div>
