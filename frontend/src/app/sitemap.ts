@@ -25,7 +25,7 @@ const DISTRICT_SLUGS = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://explorebd.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://explore-bd-gamma.vercel.app';
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
