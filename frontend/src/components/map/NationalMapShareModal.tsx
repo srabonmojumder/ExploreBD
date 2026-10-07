@@ -155,9 +155,9 @@ export function NationalMapShareModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-emerald-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl my-auto space-y-6">
+      <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-emerald-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl my-auto space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="flex items-center justify-between border-b border-white/10 pb-4 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-20">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-950/50">
               <Compass className="w-5 h-5 text-white" />
@@ -202,7 +202,7 @@ export function NationalMapShareModal({
         <div className="overflow-x-auto flex justify-center py-2">
           <div
             ref={cardRef}
-            className="w-[360px] sm:w-[420px] rounded-3xl p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-2xl text-white relative space-y-5"
+            className="w-[330px] sm:w-[420px] max-w-full rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-2xl text-white relative space-y-5"
           >
             {/* Ambient glow in card */}
             <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />

@@ -318,13 +318,13 @@ explorebd.com/districts/${districtSlug}`;
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-emerald-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+        <div className="flex items-center justify-between pb-4 border-b border-white/10 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-400" />
-            <h3 className="font-bold text-lg sm:text-xl text-white">
+            <h3 className="font-bold text-base sm:text-lg text-white">
               {displayName} সোশ্যাল ভ্রমণ কার্ড
             </h3>
           </div>
@@ -344,7 +344,7 @@ explorebd.com/districts/${districtSlug}`;
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
             <span>কার্ডে প্রদর্শিত নাম পরিবর্তন করুন:</span>
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <input
               type="text"
               value={nameInput}
@@ -353,17 +353,17 @@ explorebd.com/districts/${districtSlug}`;
                 setTravelerName(e.target.value);
               }}
               placeholder="আপনার নাম লিখুন..."
-              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500"
               maxLength={25}
             />
-            <span className="text-xs text-slate-500 font-mono">
-              {visitedPlacesCount} স্পট সংগৃহীত
+            <span className="text-xs text-slate-400 font-mono self-end sm:self-auto">
+              {visitedPlacesCount} স্পট সম্পন্ন
             </span>
           </div>
         </div>
 
         {/* Live Canvas Preview (Responsive scaling) */}
-        <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden border border-emerald-500/20 shadow-2xl bg-slate-950 flex items-center justify-center">
+        <div className="relative w-full max-h-[46vh] aspect-[4/5] mx-auto rounded-2xl overflow-hidden border border-emerald-500/20 shadow-2xl bg-slate-950 flex items-center justify-center">
           <canvas
             ref={canvasRef}
             className="w-full h-full object-contain rounded-2xl"
