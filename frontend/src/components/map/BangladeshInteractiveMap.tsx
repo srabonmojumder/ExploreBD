@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Manchitro, resolveDistrict, ValidDistrict } from 'manchitro';
 import { District } from '@/lib/api-client';
@@ -10,13 +10,17 @@ import {
   Compass,
   MapPin,
   Check,
-  Plus,
   Share2,
   ExternalLink,
   Sparkles,
-  Info,
   CheckCircle2,
   X,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Pin,
+  Layers,
+  Move,
 } from 'lucide-react';
 
 interface BangladeshInteractiveMapProps {
@@ -33,7 +37,6 @@ export function BangladeshInteractiveMap({
     getVisitedDistrictSlugs,
     toggleDistrictVisit,
     isDistrictVisited,
-    getDistrictVisits,
   } = useTravelStore();
 
   const [selectedDistrictName, setSelectedDistrictName] = useState<ValidDistrict | null>(null);
@@ -42,6 +45,12 @@ export function BangladeshInteractiveMap({
     x: number;
     y: number;
   } | null>(null);
+
+  // Zoom & Pan State
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Map district slugs to canonical manchitro names and vice-versa
   const { slugToCanonical, canonicalToDistrict } = useMemo(() => {
@@ -81,103 +90,273 @@ export function BangladeshInteractiveMap({
     return canonicalToDistrict.get(selectedDistrictName) || null;
   }, [selectedDistrictName, canonicalToDistrict]);
 
+  const hoveredDistrictObj = useMemo(() => {
+    if (!hoveredDistrict) return null;
+    return canonicalToDistrict.get(hoveredDistrict.name) || null;
+  }, [hoveredDistrict, canonicalToDistrict]);
+
   const isSelectedVisited = Boolean(
     selectedDistrictObj && mounted && isDistrictVisited(selectedDistrictObj.slug)
   );
 
-  const selectedVisits = useMemo(() => {
-    if (!selectedDistrictObj || !mounted) return [];
-    return getDistrictVisits(selectedDistrictObj.slug);
-  }, [selectedDistrictObj, mounted, getDistrictVisits]);
-
   const visitedCount = activeCanonicalDistricts.length;
   const percentage = Math.round((visitedCount / 64) * 100);
 
+  // Toggle selection: Tap to pin, tap same district again to unselect!
+  const handleSelectDistrict = (district: ValidDistrict) => {
+    if (selectedDistrictName === district) {
+      setSelectedDistrictName(null);
+    } else {
+      setSelectedDistrictName(district);
+    }
+  };
+
+  // Zoom controls
+  const handleZoomIn = () => setZoomLevel((z) => Math.min(Number((z + 0.25).toFixed(2)), 2.5));
+  const handleZoomOut = () => {
+    setZoomLevel((z) => {
+      const next = Math.max(Number((z - 0.25).toFixed(2)), 1);
+      if (next === 1) setPan({ x: 0, y: 0 });
+      return next;
+    });
+  };
+  const handleResetZoom = () => {
+    setZoomLevel(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  // Drag to pan when zoomed
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoomLevel > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && zoomLevel > 1) {
+      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  // Touch handlers for mobile pan
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (zoomLevel > 1 && e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && zoomLevel > 1 && e.touches.length === 1) {
+      setPan({ x: e.touches[0].clientX - dragStart.x, y: e.touches[0].clientY - dragStart.y });
+    }
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
+
   return (
-    <div className="relative flex flex-col lg:flex-row gap-6 items-stretch rounded-3xl glass-card border border-white/10 p-5 sm:p-8 overflow-hidden shadow-2xl">
-      {/* Background glow */}
+    <div className="relative flex flex-col lg:flex-row gap-6 items-stretch rounded-3xl glass-card border border-white/10 p-4 sm:p-7 overflow-hidden shadow-2xl">
+      {/* Background ambient lighting */}
       <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Map Column */}
-      <div className="relative flex-1 flex flex-col items-center justify-center min-h-[440px] sm:min-h-[560px]">
+      <div className="relative flex-1 flex flex-col items-center justify-between min-h-[460px] sm:min-h-[580px]">
         {/* Header inside map */}
-        <div className="w-full flex items-center justify-between pb-3 border-b border-white/5 mb-2">
+        <div className="w-full flex items-center justify-between pb-3 border-b border-white/5 mb-2 gap-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-slate-300">
+            <span className="text-xs sm:text-sm font-bold text-slate-200">
               ইন্টারেক্টিভ বাংলাদেশ মানচিত্র (৬৪ জেলা)
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold">
+            <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold">
               {visitedCount} / ৬৪ জেলা ({percentage}%)
             </span>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="w-full flex flex-wrap items-center gap-4 text-[11px] text-slate-400 mb-2 py-1">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-500 shadow-sm shadow-emerald-500/50" />
-            <span>ঘুরেছি (Visited)</span>
+        {/* Legend & Instructions */}
+        <div className="w-full flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 mb-2 py-1 bg-slate-900/40 px-3 rounded-xl border border-white/5">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
+              <span>ঘুরেছি</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-700 border border-white/20" />
+              <span>অদেখা</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+              <span>পিন করা</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-slate-800 border border-white/20" />
-            <span>অদেখা জেলা</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-amber-400" />
-            <span>নির্বাচিত</span>
-          </div>
-          <span className="text-slate-500 text-[10px]">
-            • যে কোনো জেলায় ক্লিক করে ঘুরেছি/অদেখা টগল করুন
+          <span className="text-slate-400 text-[10px]">
+            • ট্যাপ করে পিন করুন • একই জায়গায় আবার ট্যাপ করলে আনসিলেক্ট হবে
           </span>
         </div>
 
-        {/* Manchitro SVG Map Container */}
-        <div className="relative w-full max-w-[500px] aspect-[1555/2140] flex items-center justify-center py-2">
-          <Manchitro
-            items={activeCanonicalDistricts}
-            value={selectedDistrictName}
-            onSelect={(district) => setSelectedDistrictName(district)}
-            onDistrictMouseEnter={(district, e) => {
-              setHoveredDistrict({
-                name: district,
-                x: e.clientX,
-                y: e.clientY,
-              });
-            }}
-            onDistrictMouseLeave={() => setHoveredDistrict(null)}
-            className="w-full h-full flex items-center justify-center relative cursor-pointer"
-            svgClassName="w-full h-auto max-h-[520px] transition-transform duration-300"
-            colors={{
-              base: '#1e293b',
-              active: '#10b981',
-              selected: '#f59e0b',
-              stroke: 'rgba(255, 255, 255, 0.2)',
-              selectedStroke: '#ffffff',
-              selectedGlow: 'rgba(245, 158, 11, 0.45)',
-            }}
-            renderSelected={() => null}
-            renderDebug={() => null}
-          />
-
-          {/* Hover Floating Tooltip */}
-          {hoveredDistrict && (
-            <div
-              className="fixed pointer-events-none z-50 px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md border border-emerald-500/40 text-xs shadow-2xl text-white transform -translate-x-1/2 -translate-y-full mt-[-8px]"
-              style={{ left: hoveredDistrict.x, top: hoveredDistrict.y }}
+        {/* Manchitro SVG Map Container with Zoom Controls */}
+        <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/40 border border-white/5 min-h-[380px] sm:min-h-[480px]">
+          {/* Floating Zoom Controls Bar */}
+          <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 p-1 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-white/10 shadow-xl">
+            <button
+              type="button"
+              onClick={handleZoomIn}
+              disabled={zoomLevel >= 2.5}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-emerald-600/30 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+              title="Zoom In (+)"
+              aria-label="Zoom In"
             >
-              <div className="font-bold text-emerald-300">{hoveredDistrict.name}</div>
-              <div className="text-[10px] text-slate-300">
-                {activeCanonicalDistricts.includes(hoveredDistrict.name)
-                  ? '✅ ভ্রমণ সম্পন্ন'
-                  : 'ক্লিক করে ঘুরেছি মার্ক করুন'}
+              <ZoomIn className="w-4 h-4 text-emerald-400" />
+            </button>
+            <button
+              type="button"
+              onClick={handleZoomOut}
+              disabled={zoomLevel <= 1}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-emerald-600/30 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+              title="Zoom Out (-)"
+              aria-label="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4 text-emerald-400" />
+            </button>
+            <button
+              type="button"
+              onClick={handleResetZoom}
+              disabled={zoomLevel === 1 && pan.x === 0 && pan.y === 0}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-emerald-600/30 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+              title="Reset Zoom (100%)"
+              aria-label="Reset Zoom"
+            >
+              <RotateCcw className="w-4 h-4 text-amber-400" />
+            </button>
+            {zoomLevel > 1 && (
+              <span className="text-[9px] font-bold text-center text-emerald-300 pb-0.5">
+                {Math.round(zoomLevel * 100)}%
+              </span>
+            )}
+          </div>
+
+          {/* Floating Pinned District Indicator on Map */}
+          {selectedDistrictObj && (
+            <div className="absolute top-3 left-3 z-30 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md border border-amber-500/50 text-xs shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 max-w-[80%]">
+              <Pin className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
+              <div className="truncate">
+                <span className="font-bold text-white">
+                  {selectedDistrictObj.bnName || selectedDistrictObj.name}
+                </span>
+                <span className="text-[11px] text-emerald-300 ml-1.5">
+                  ({selectedDistrictObj.division?.name} বিভাগ)
+                </span>
               </div>
+              <button
+                type="button"
+                onClick={() => setSelectedDistrictName(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 shrink-0"
+                title="আনসিলেক্ট করুন (Unpin)"
+              >
+                <X className="w-3 h-3" />
+              </button>
             </div>
           )}
+
+          {/* Zoom & Pan Drag Area */}
+          <div
+            className={`relative w-full max-w-[500px] aspect-[1555/2140] flex items-center justify-center py-2 select-none ${
+              zoomLevel > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-pointer'
+            }`}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={() => {
+              handleMouseUp();
+              setHoveredDistrict(null);
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div
+              style={{
+                transform: `scale(${zoomLevel}) translate(${pan.x / zoomLevel}px, ${pan.y / zoomLevel}px)`,
+                transformOrigin: 'center center',
+                transition: isDragging ? 'none' : 'transform 200ms ease-out',
+              }}
+              className="w-full h-full flex items-center justify-center transform-gpu"
+            >
+              <Manchitro
+                items={activeCanonicalDistricts}
+                value={selectedDistrictName}
+                onSelect={handleSelectDistrict}
+                onDistrictMouseEnter={(district, e) => {
+                  setHoveredDistrict({
+                    name: district,
+                    x: e.clientX,
+                    y: e.clientY,
+                  });
+                }}
+                onDistrictMouseLeave={() => setHoveredDistrict(null)}
+                className="w-full h-full flex items-center justify-center relative"
+                svgClassName="w-full h-auto max-h-[500px] transition-transform duration-300 drop-shadow-md"
+                colors={{
+                  base: '#1e293b',
+                  active: '#10b981',
+                  selected: '#f59e0b',
+                  stroke: 'rgba(255, 255, 255, 0.25)',
+                  selectedStroke: '#ffffff',
+                  selectedGlow: 'rgba(245, 158, 11, 0.6)',
+                }}
+                renderSelected={() => null}
+                renderDebug={() => null}
+              />
+            </div>
+
+            {/* Hover Floating Tooltip with Division Name */}
+            {hoveredDistrict && (
+              <div
+                className="fixed pointer-events-none z-50 px-3.5 py-2 rounded-2xl bg-slate-950/95 backdrop-blur-xl border border-emerald-500/50 text-xs shadow-2xl text-white transform -translate-x-1/2 -translate-y-full mt-[-12px] space-y-1 animate-in fade-in zoom-in-95 duration-150 pointer-events-none"
+                style={{ left: hoveredDistrict.x, top: hoveredDistrict.y }}
+              >
+                <div className="flex items-center gap-1.5 font-bold text-white text-sm">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{hoveredDistrictObj?.bnName || hoveredDistrict.name}</span>
+                  {hoveredDistrictObj?.name && (
+                    <span className="text-[11px] font-normal text-slate-400">
+                      ({hoveredDistrictObj.name})
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[11px] text-teal-300 font-semibold">
+                  <Layers className="w-3 h-3 text-teal-400" />
+                  <span>
+                    বিভাগ: {hoveredDistrictObj?.division?.bnName || hoveredDistrictObj?.division?.name || 'বাংলাদেশ'} বিভাগ
+                  </span>
+                </div>
+
+                <div className="text-[10px] text-slate-400 pt-0.5 border-t border-white/5">
+                  {activeCanonicalDistricts.includes(hoveredDistrict.name)
+                    ? '✅ ভ্রমণ সম্পন্ন (Visited)'
+                    : 'ট্যাপ করে পিন করুন / ঘুরেছি মার্ক করুন'}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Zoom drag guide when zoomed */}
+        {zoomLevel > 1 && (
+          <div className="w-full flex items-center justify-center gap-1.5 text-[10px] text-slate-400 pt-2">
+            <Move className="w-3 h-3 text-emerald-400" />
+            <span>ড্র্যাগ করে ম্যাপের অন্যান্য অংশ দেখুন</span>
+          </div>
+        )}
       </div>
 
       {/* Side Details & Action Panel */}
@@ -196,20 +375,24 @@ export function BangladeshInteractiveMap({
 
           {/* Selected District Card or Default Helper */}
           {selectedDistrictObj ? (
-            <div className="glass-card rounded-2xl p-5 border border-emerald-500/30 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="glass-card rounded-2xl p-5 border border-amber-500/40 space-y-4 animate-in fade-in zoom-in-95 duration-200 bg-slate-900/80 shadow-2xl">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
-                    {selectedDistrictObj.division?.name || 'বাংলাদেশ'} বিভাগ
-                  </span>
-                  <h3 className="text-xl font-black text-white mt-0.5">
-                    {selectedDistrictObj.bnName || selectedDistrictObj.name}
+                  <div className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-emerald-400 tracking-wider">
+                    <Layers className="w-3.5 h-3.5 text-teal-400" />
+                    <span>{selectedDistrictObj.division?.name || 'বাংলাদেশ'} বিভাগ</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white mt-0.5 flex items-center gap-1.5">
+                    <Pin className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <span>{selectedDistrictObj.bnName || selectedDistrictObj.name}</span>
                   </h3>
                   <p className="text-xs text-slate-400">{selectedDistrictObj.name} District</p>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setSelectedDistrictName(null)}
                   className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+                  title="আনসিলেক্ট করুন (Unselect)"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -231,6 +414,7 @@ export function BangladeshInteractiveMap({
 
                 {/* Toggle Button */}
                 <button
+                  type="button"
                   onClick={() => toggleDistrictVisit(selectedDistrictObj.slug)}
                   className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
                     isSelectedVisited
@@ -266,8 +450,8 @@ export function BangladeshInteractiveMap({
               <Compass className="w-8 h-8 text-emerald-400 mx-auto animate-pulse" />
               <h4 className="text-sm font-bold text-white">যে কোনো জেলায় ক্লিক করুন</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                মানচিত্রে আপনি যে জেলাগুলোতে গিয়েছেন সেগুলোতে ক্লিক করে সরাসরি ঘুরেছি মার্ক করতে
-                পারবেন।
+                মানচিত্রে আপনি যে জেলাগুলোতে গিয়েছেন সেগুলোতে ক্লিক করে সরাসরি ঘুরেছি পিন ও মার্ক করতে
+                পারবেন। একই জেলায় আবার ক্লিক করলে আনসিলেক্ট হয়ে যাবে।
               </p>
             </div>
           )}
