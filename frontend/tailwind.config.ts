@@ -30,7 +30,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', '"Hind Siliguri"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
       },
     },
   },
