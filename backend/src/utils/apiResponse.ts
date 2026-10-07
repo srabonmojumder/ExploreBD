@@ -8,6 +8,9 @@ export interface ApiResponseOptions<T> {
 
 export class ApiResponse {
   static success<T>(res: Response, data: T, statusCode = 200, message?: string) {
+    if (res.req && res.req.method === 'GET') {
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    }
     return res.status(statusCode).json({
       success: true,
       ...(message ? { message } : {}),

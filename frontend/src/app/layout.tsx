@@ -1,10 +1,26 @@
 import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans, Hind_Siliguri } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/lib/query-provider';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const hindSiliguri = Hind_Siliguri({
+  subsets: ['bengali'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-bengali',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: 'ExploreBD — Bangladesh Travel Exploration Platform',
   description:
     'Discover, track, and share your journeys across all 8 Divisions and 64 Districts of Bangladesh. Collect achievements, view interactive maps, and compete on the national leaderboard.',
@@ -48,7 +64,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth" suppressHydrationWarning>
+    <html
+      lang="bn"
+      className={`dark scroll-smooth ${plusJakartaSans.variable} ${hindSiliguri.variable}`}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen flex flex-col font-sans" suppressHydrationWarning>
         <QueryProvider>
           <Navbar />
