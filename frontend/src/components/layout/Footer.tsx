@@ -63,20 +63,24 @@ export function Footer() {
 
   return (
     <footer className="relative bg-black text-slate-300 mt-24 border-t border-white/10 overflow-hidden">
-      {/* 1. TOP NEWSLETTER SUBSCRIBE BAR (Matching reference image) */}
-      <div className="pt-12 pb-6 px-4 max-w-xl mx-auto text-center relative z-20">
-        <p className="text-xs font-semibold text-emerald-400 tracking-wider uppercase mb-2">
-          ExploreBD ট্রাভেল ডায়েরি
-        </p>
-        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-4">
+      {/* 1. TOP NEWSLETTER SUBSCRIBE BAR */}
+      <div className="pt-14 pb-8 px-4 max-w-2xl mx-auto text-center relative z-20">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-bold uppercase tracking-wider mb-3">
+          <Sparkles className="w-4 h-4 text-emerald-400" />
+          <span>ExploreBD ট্রাভেল ডায়েরি</span>
+        </div>
+        <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
           বাংলাদেশের নতুন সব পর্যটন আপডেট পান
         </h3>
+        <p className="text-sm sm:text-base text-slate-300 mb-6 max-w-lg mx-auto">
+          প্রতি সপ্তাহে ৬৪ জেলার নতুন দর্শনীয় স্থান, ট্রাভেল গাইড এবং স্পেশাল ভ্রমণ টিপস সরাসরি আপনার ইনবক্সে।
+        </p>
         <form
           onSubmit={handleSubscribe}
-          className="flex items-center bg-slate-900/90 border border-white/20 rounded-full p-1.5 shadow-2xl backdrop-blur-xl focus-within:border-emerald-400 transition-colors"
+          className="flex items-center bg-slate-900/90 border border-white/20 rounded-full p-2 shadow-2xl backdrop-blur-xl focus-within:border-emerald-400 transition-colors max-w-xl mx-auto"
         >
-          <div className="pl-3 text-slate-400 flex items-center">
-            <Mail className="w-4 h-4" />
+          <div className="pl-4 text-slate-400 flex items-center">
+            <Mail className="w-5 h-5" />
           </div>
           <input
             type="email"
@@ -84,29 +88,29 @@ export function Footer() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="আপনার ইমেইল অ্যাড্রেস লিখুন..."
             required
-            className="w-full bg-transparent px-3 py-2 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none"
+            className="w-full bg-transparent px-3.5 py-2.5 text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-950/60 transition-all flex-shrink-0"
+            className="px-6 py-3 rounded-full btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-950/60 transition-colors flex-shrink-0"
           >
             {subscribed ? (
               <>
-                <Check className="w-3.5 h-3.5" />
+                <Check className="w-4 h-4 text-white" />
                 <span>যুক্ত হয়েছেন!</span>
               </>
             ) : (
               <>
                 <span>সাবস্ক্রাইব</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
       </div>
 
-      {/* 2. THE GLOWING EARTH GLOBE WITH 8 FLOATING CARDS (Exact match to reference image) */}
-      <div className="relative w-full min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] flex items-center justify-center overflow-hidden py-10 px-4">
+      {/* 2. THE GLOWING EARTH GLOBE WITH 8 FLOATING CARDS */}
+      <div className="relative w-full min-h-[480px] sm:min-h-[540px] lg:min-h-[600px] flex items-center justify-center overflow-hidden py-12 px-4">
         {/* Continuous Looping Globe Video Background */}
         <div className="absolute inset-0 pointer-events-none select-none z-0 flex items-center justify-center overflow-hidden">
           <video
@@ -122,25 +126,25 @@ export function Footer() {
           </video>
           {/* Edge vignette gradients to smoothly blend into pitch black background */}
           <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black to-transparent pointer-events-none" />
         </div>
 
-        {/* 8 Floating Division Cards (Arranged in 2 rows of 4 over the globe horizon) */}
-        <div className="relative z-10 max-w-5xl mx-auto w-full">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {/* 8 Floating Division Cards (Clear, Readable Typography) */}
+        <div className="relative z-10 max-w-6xl mx-auto w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
             {divisions.map((div) => (
               <Link
                 key={div.name}
                 href={`#division-${div.name.toLowerCase()}`}
-                className="group p-3 sm:p-4 rounded-2xl bg-slate-950/75 hover:bg-slate-900/90 backdrop-blur-md border border-cyan-500/30 hover:border-cyan-400 shadow-xl shadow-cyan-950/30 hover:shadow-[0_0_24px_rgba(6,182,212,0.45)] transition-all duration-300 flex flex-col items-center justify-center text-center"
+                className="group p-4 sm:p-5 rounded-2xl bg-slate-950/80 hover:bg-slate-900/95 backdrop-blur-md border border-cyan-500/30 hover:border-cyan-400 shadow-xl shadow-cyan-950/30 hover:shadow-[0_0_24px_rgba(6,182,212,0.45)] transition-all duration-300 flex flex-col items-center justify-center text-center"
               >
-                <span className="text-sm sm:text-base font-black text-white tracking-tight group-hover:text-cyan-300 transition-colors">
+                <span className="text-base sm:text-lg font-black text-white tracking-tight group-hover:text-cyan-300 transition-colors">
                   {div.name}
                 </span>
-                <span className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-0.5">
+                <span className="text-xs sm:text-sm text-cyan-300 font-bold mt-1">
                   {div.bn}
                 </span>
-                <span className="text-[10px] text-slate-400 mt-1 line-clamp-1 group-hover:text-slate-300 transition-colors">
+                <span className="text-xs text-slate-300 mt-1 line-clamp-1 group-hover:text-white transition-colors">
                   {div.info}
                 </span>
               </Link>
@@ -149,37 +153,38 @@ export function Footer() {
         </div>
       </div>
 
-      {/* 3. MULTI-COLUMN NAVIGATION (Matching reference image layout) */}
+      {/* 3. MULTI-COLUMN NAVIGATION & FEATURED FACEBOOK CREATOR CARD */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
           {/* Column 1: Important Links */}
-          <div className="space-y-3">
-            <h4 className="font-bold text-white text-xs tracking-wider uppercase">
-              গুরুত্বপূর্ণ লিংক
+          <div className="space-y-4">
+            <h4 className="font-bold text-white text-sm sm:text-base tracking-wider uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>গুরুত্বপূর্ণ লিংক</span>
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-sm sm:text-base">
               <li>
-                <Link href="/" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   হোমপেজ
                 </Link>
               </li>
               <li>
-                <Link href="/tracker" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  ভ্রমণ ট্র্যাকার
+                <Link href="/tracker" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                  ভ্রমণ ট্র্যাকার ও মানচিত্র
                 </Link>
               </li>
               <li>
-                <Link href="/places" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  দর্শনীয় স্থানসমূহ
+                <Link href="/places" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                  দর্শনীয় পর্যটন স্থানসমূহ
                 </Link>
               </li>
               <li>
-                <Link href="/districts" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  ৬৪ জেলা ডিরেক্টরি
+                <Link href="/districts" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                  ৬৪ জেলা ভ্রমণ ডিরেক্টরি
                 </Link>
               </li>
               <li>
-                <Link href="/#divisions" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/#divisions" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   ৮টি প্রশাসনিক বিভাগ
                 </Link>
               </li>
@@ -187,33 +192,34 @@ export function Footer() {
           </div>
 
           {/* Column 2: Travel Services */}
-          <div className="space-y-3">
-            <h4 className="font-bold text-white text-xs tracking-wider uppercase">
-              ভ্রমণ সেবা
+          <div className="space-y-4">
+            <h4 className="font-bold text-white text-sm sm:text-base tracking-wider uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>ভ্রমণ সেবা ও ফিচার</span>
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-sm sm:text-base">
               <li>
-                <Link href="/tracker" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  ইন্টারেক্টিভ মানচিত্র
+                <Link href="/tracker" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                  ইন্টারেক্টিভ বাংলাদেশ মানচিত্র
                 </Link>
               </li>
               <li>
-                <Link href="/tracker" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/tracker" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   সোশ্যাল কার্ড জেনারেটর
                 </Link>
               </li>
               <li>
-                <Link href="/places" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/places" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   স্পট তথ্য ও ছবি গ্যালারি
                 </Link>
               </li>
               <li>
-                <Link href="/districts" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  জেলা ট্রাভেল গাইড
+                <Link href="/districts" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                  জেলাভিত্তিক ভ্রমণ গাইড
                 </Link>
               </li>
               <li>
-                <Link href="/#status" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/#status" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   লাইভ সিস্টেম স্ট্যাটাস
                 </Link>
               </li>
@@ -221,141 +227,110 @@ export function Footer() {
           </div>
 
           {/* Column 3: Explore Categories */}
-          <div className="space-y-3">
-            <h4 className="font-bold text-white text-xs tracking-wider uppercase">
-              জনপ্রিয় ক্যাটাগরি
+          <div className="space-y-4">
+            <h4 className="font-bold text-white text-sm sm:text-base tracking-wider uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>জনপ্রিয় ক্যাটাগরি</span>
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-sm sm:text-base">
               <li>
-                <Link href="/places?category=hill" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/places?category=hill" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   পাহাড় ও ট্রেকিং
                 </Link>
               </li>
               <li>
-                <Link href="/places?category=sea" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/places?category=sea" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   সমুদ্র সৈকত ও দ্বীপমালা
                 </Link>
               </li>
               <li>
-                <Link href="/places?category=historical" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  প্রত্নতাত্ত্বিক ও ঐতিহ্য
+                <Link href="/places?category=historical" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                  ঐতিহাসিক ও প্রত্নতাত্ত্বিক
                 </Link>
               </li>
               <li>
-                <Link href="/places?category=nature" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/places?category=nature" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   অরণ্য, হাওড় ও চা বাগান
                 </Link>
               </li>
               <li>
-                <Link href="/places?category=waterfall" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                <Link href="/places?category=waterfall" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   ঝর্ণা ও জলপ্রপাত
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Comparison & Stats */}
-          <div className="space-y-3">
-            <h4 className="font-bold text-white text-xs tracking-wider uppercase">
-              পরিসংখ্যান ও অর্জন
-            </h4>
-            <ul className="space-y-2 text-xs">
-              <li>
-                <Link href="/tracker" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  ৬৪ জেলার ভ্রমণ অগ্রগতি
-                </Link>
-              </li>
-              <li>
-                <Link href="/tracker" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  সোশ্যাল ব্যাজ শেয়ারিং
-                </Link>
-              </li>
-              <li>
-                <Link href="/places" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  সর্বাধিক পরিদর্শিত স্পট
-                </Link>
-              </li>
-              <li>
-                <Link href="/districts" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  বিভাগভিত্তিক অগ্রগতি
-                </Link>
-              </li>
-              <li>
-                <Link href="/tracker" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  ব্যক্তিগত ভ্রমণ ডায়েরি
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 5: Facebook Style Community & Developer Card */}
-          <div className="col-span-2 md:col-span-2 lg:col-span-1 space-y-3">
-            <h4 className="font-bold text-white text-xs tracking-wider uppercase flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          {/* Column 4: Community & Developer - PROMINENT FACEBOOK PROFILE & BANNER SHOWCASE */}
+          <div className="space-y-4">
+            <h4 className="font-bold text-white text-sm sm:text-base tracking-wider uppercase flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
               <span>কমিউনিটি ও ডেভেলপার</span>
             </h4>
 
-            {/* Facebook Profile Banner Card */}
-            <div className="rounded-2xl bg-slate-900/90 border border-white/15 overflow-hidden shadow-2xl group transition-all duration-300 hover:border-blue-500/40">
-              {/* Facebook Cover Photo Banner (Links to Official Facebook Page) */}
+            {/* Prominent Facebook Profile & Cover Showcase Card */}
+            <div className="rounded-2xl bg-slate-900/95 border border-white/20 overflow-hidden shadow-2xl group transition-all duration-300 hover:border-blue-500/50">
+              {/* Clearly Visible Facebook Cover Photo Banner (120px tall, clear lighting) */}
               <a
                 href="https://www.facebook.com/profile.php?id=61594934441480"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative h-20 w-full overflow-hidden bg-slate-800 block cursor-pointer"
+                className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-800 block cursor-pointer"
                 title="ExploreBD অফিসিয়াল ফেসবুক পেজে যান"
               >
                 <Image
                   src="/cover.jpg"
                   alt="ExploreBD Official Facebook Page Cover"
                   fill
-                  sizes="(max-width: 768px) 100vw, 320px"
+                  sizes="(max-width: 768px) 100vw, 360px"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-black/40" />
-                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-blue-600/90 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 shadow">
-                  <Facebook className="w-3 h-3" />
+                {/* Clean soft shadow so the cover image is 100% visible */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-black/20" />
+                <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-blue-600 backdrop-blur-md text-xs font-bold text-white flex items-center gap-1.5 shadow-lg border border-blue-400/30">
+                  <Facebook className="w-3.5 h-3.5 fill-current" />
                   <span>ExploreBD Page</span>
                 </div>
               </a>
 
               {/* Profile Avatar & Info Body */}
-              <div className="px-3.5 pb-3.5 pt-0 relative">
-                {/* Overlapping Profile Avatar (Links to Personal Account) */}
-                <div className="flex items-end justify-between -mt-7 mb-2">
+              <div className="px-4 pb-4 pt-0 relative">
+                {/* Large, Clearly Visible Overlapping Avatar (72px / w-18) */}
+                <div className="flex items-end justify-between -mt-9 mb-2.5">
                   <a
                     href="https://www.facebook.com/sraabonmozumder/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative w-14 h-14 rounded-full border-2 border-slate-900 overflow-hidden bg-slate-950 shadow-xl ring-2 ring-blue-500/70 hover:ring-blue-400 block transition-all flex-shrink-0"
+                    className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border-3 border-slate-900 overflow-hidden bg-slate-950 shadow-2xl ring-2 ring-blue-500/80 hover:ring-blue-400 block transition-all flex-shrink-0"
                     title="শ্রাবণ মজুমদার এর ব্যক্তিগত প্রোফাইল"
                   >
                     <Image
                       src="/logo.jpg"
                       alt="Srabon Mozumder Profile Avatar"
                       fill
-                      sizes="56px"
+                      sizes="80px"
                       className="object-cover"
                     />
                   </a>
-                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold bg-emerald-950/70 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-full shadow">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Active Creator</span>
                   </div>
                 </div>
 
                 {/* Name, Verified Badge & Bio */}
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-1.5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
                     <a
                       href="https://www.facebook.com/sraabonmozumder/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm font-black text-white hover:text-blue-400 tracking-tight transition-colors"
+                      className="text-base sm:text-lg font-black text-white hover:text-blue-400 tracking-tight transition-colors"
                     >
                       শ্রাবণ মজুমদার
                     </a>
-                    <div className="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Creator">
+                    <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-white flex-shrink-0" title="Verified Creator">
                       <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
                         <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                       </svg>
@@ -365,25 +340,25 @@ export function Footer() {
                     href="https://www.facebook.com/sraabonmozumder/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] text-blue-400 hover:underline font-semibold block"
+                    className="text-xs sm:text-sm text-blue-400 hover:underline font-semibold block"
                   >
                     @sraabonmozumder
                   </a>
-                  <p className="text-[10px] text-slate-300 leading-snug pt-0.5">
+                  <p className="text-xs sm:text-sm text-slate-300 leading-snug pt-0.5">
                     Founder & Developer, ExploreBD 🇧🇩
                   </p>
                 </div>
 
-                {/* Social Connect Buttons */}
-                <div className="space-y-1.5 pt-3">
+                {/* Social Connect Buttons (Clear, Comfortable Size) */}
+                <div className="space-y-2 pt-3.5">
                   {/* Official Facebook Page Button */}
                   <a
                     href="https://www.facebook.com/profile.php?id=61594934441480"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-950/60 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg btn-glitch bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-950/60 transition-colors"
                   >
-                    <Facebook className="w-3.5 h-3.5" />
+                    <Facebook className="w-4 h-4" />
                     <span>ExploreBD অফিসিয়াল পেজ</span>
                   </a>
 
@@ -392,9 +367,9 @@ export function Footer() {
                     href="https://www.facebook.com/sraabonmozumder/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg btn-glitch bg-slate-800/90 hover:bg-slate-700/90 border border-white/10 text-slate-200 text-xs font-semibold transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-slate-800/90 hover:bg-slate-700/90 border border-white/10 text-slate-200 text-xs sm:text-sm font-semibold transition-colors"
                   >
-                    <Facebook className="w-3.5 h-3.5 text-blue-400" />
+                    <Facebook className="w-4 h-4 text-blue-400" />
                     <span>ব্যক্তিগত ফেসবুক প্রোফাইল</span>
                   </a>
 
@@ -403,9 +378,9 @@ export function Footer() {
                     href="https://wa.me/8801827621312"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-semibold transition-colors"
                   >
-                    <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                    <MessageCircle className="w-4 h-4 text-emerald-400" />
                     <span>WhatsApp: 01827621312</span>
                   </a>
                 </div>
@@ -414,10 +389,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* 4. TRUST & VERIFICATION PARTNERS (Matching the logo row in reference) */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center justify-between gap-6 text-xs text-slate-400">
+        {/* 4. TRUST & VERIFICATION PARTNERS */}
+        <div className="mt-14 pt-8 border-t border-white/10 flex flex-wrap items-center justify-between gap-6 text-sm text-slate-300">
           <div className="flex items-center gap-2 font-bold text-white">
-            <span className="text-base">🇧🇩</span>
+            <span className="text-lg">🇧🇩</span>
             <span>৬৪ জেলা কাভারেজ</span>
           </div>
           <div className="flex items-center gap-2 font-bold text-emerald-400">
@@ -439,7 +414,7 @@ export function Footer() {
         </div>
 
         {/* 5. COPYRIGHT & LEGAL BAR */}
-        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-slate-400">
           <Link href="/#" className="hover:text-slate-200 transition-colors">
             শর্তাবলী ও নীতিমালা
           </Link>
