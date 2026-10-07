@@ -2,9 +2,10 @@
 
 import React, { useRef, useState, useMemo } from 'react';
 import { toPng } from 'html-to-image';
-import { Manchitro, resolveDistrict, ValidDistrict } from 'manchitro';
+import { Manchitro, resolveDistrict, DISTRICTS, ValidDistrict } from 'manchitro';
 import { District } from '@/lib/api-client';
 import { useTravelStore, calculateDistrictLevel } from '@/stores/useTravelStore';
+import { useAppStore } from '@/stores/useAppStore';
 import {
   X,
   Download,
@@ -16,12 +17,14 @@ import {
   Compass,
   MapPin,
   Flame,
+  Layers,
 } from 'lucide-react';
 
 interface NationalMapShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   districts: District[];
+  selectedDivisionSlug?: string | null;
 }
 
 const DIVISION_META = [
@@ -39,29 +42,51 @@ export function NationalMapShareModal({
   isOpen,
   onClose,
   districts,
+  selectedDivisionSlug: propSelectedDivisionSlug,
 }: NationalMapShareModalProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const { travelerName, setTravelerName, getVisitedDistrictSlugs, getTotalVisitsCount } =
     useTravelStore();
+  const appSelectedDivisionSlug = useAppStore((state) => state.selectedDivisionSlug);
+
+  const activeDivisionSlug = propSelectedDivisionSlug ?? appSelectedDivisionSlug;
 
   const [nameInput, setNameInput] = useState(travelerName || 'ভ্রমণপিপাসু');
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
+  // All 64 canonical districts so Manchitro renders every district cleanly
+  const allCanonicalDistricts = useMemo(() => {
+    return [...DISTRICTS] as ValidDistrict[];
+  }, []);
+
   // Map district slugs to canonical manchitro names
-  const { slugToCanonical, visitedSlugs } = useMemo(() => {
+  const { slugToCanonical, visitedSlugs, divisionCanonicalMap } = useMemo(() => {
     const slugMap = new Map<string, ValidDistrict>();
+    const divCanonicalMap = new Map<string, ValidDistrict[]>();
+
     districts.forEach((d) => {
       const canonical = resolveDistrict(d.name) || resolveDistrict(d.slug);
-      if (canonical) slugMap.set(d.slug, canonical);
+      if (canonical) {
+        slugMap.set(d.slug, canonical);
+        const divSlug = d.division?.slug || 'other';
+        if (!divCanonicalMap.has(divSlug)) {
+          divCanonicalMap.set(divSlug, []);
+        }
+        divCanonicalMap.get(divSlug)!.push(canonical);
+      }
     });
 
     const vSlugs = getVisitedDistrictSlugs();
-    return { slugToCanonical: slugMap, visitedSlugs: vSlugs };
+    return {
+      slugToCanonical: slugMap,
+      visitedSlugs: vSlugs,
+      divisionCanonicalMap: divCanonicalMap,
+    };
   }, [districts, getVisitedDistrictSlugs]);
 
-  // Active canonical names for Manchitro
-  const activeCanonicalDistricts = useMemo(() => {
+  // Active visited canonical names for Manchitro
+  const visitedCanonicalDistricts = useMemo(() => {
     const result: ValidDistrict[] = [];
     visitedSlugs.forEach((slug) => {
       const canon = slugToCanonical.get(slug);
@@ -71,6 +96,12 @@ export function NationalMapShareModal({
     });
     return result;
   }, [visitedSlugs, slugToCanonical]);
+
+  // Canonical districts of the currently selected division (if any)
+  const activeDivisionCanonicalNames = useMemo(() => {
+    if (!activeDivisionSlug) return [];
+    return divisionCanonicalMap.get(activeDivisionSlug) || [];
+  }, [activeDivisionSlug, divisionCanonicalMap]);
 
   const visitedCount = visitedSlugs.length;
   const percentage = Math.round((visitedCount / 64) * 100);
@@ -167,7 +198,7 @@ export function NationalMapShareModal({
                 বাংলাদেশ ভ্রমণ ম্যাপ কার্ড
               </h2>
               <p className="text-xs text-slate-400">
-                সোশ্যাল মিডিয়ায় শেয়ার করার জন্য ফটো কার্ড ডাউনলোড করুন
+                সম্পূর্ণ বাংলাদেশ ম্যাপে আপনার ঘুরে দেখা জেলাসমূহ সহ HD ফটো কার্ড
               </p>
             </div>
           </div>
@@ -202,8 +233,51 @@ export function NationalMapShareModal({
         <div className="overflow-x-auto flex justify-center py-2">
           <div
             ref={cardRef}
-            className="w-[330px] sm:w-[420px] max-w-full rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-2xl text-white relative space-y-5"
+            className="w-[340px] sm:w-[430px] max-w-full rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-2xl text-white relative space-y-4"
           >
+            {/* Scoped CSS for full map clarity in exported image */}
+            <style>{`
+              .share-card-map-svg g path {
+                fill: #1e293b !important;
+                stroke: rgba(255, 255, 255, 0.38) !important;
+                stroke-width: 1.2px !important;
+                opacity: 1 !important;
+              }
+
+              /* All selected / visited districts stand out in vibrant emerald green */
+              ${visitedCanonicalDistricts
+                .map(
+                  (name) => `
+                .share-card-map-svg g[aria-label="${name}"] path {
+                  fill: #10b981 !important;
+                  stroke: #ffffff !important;
+                  stroke-width: 2px !important;
+                  opacity: 1 !important;
+                  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.9)) !important;
+                }
+              `
+                )
+                .join('\n')}
+
+              /* Selected division accent outline (if active) */
+              ${
+                activeDivisionSlug
+                  ? activeDivisionCanonicalNames
+                      .map((name) => {
+                        const isVisited = visitedCanonicalDistricts.includes(name);
+                        return `
+                  .share-card-map-svg g[aria-label="${name}"] path {
+                    stroke: ${isVisited ? '#34d399' : '#38bdf8'} !important;
+                    stroke-width: 2.4px !important;
+                    ${!isVisited ? 'fill: #0891b2 !important;' : ''}
+                  }
+                `;
+                      })
+                      .join('\n')
+                  : ''
+              }
+            `}</style>
+
             {/* Ambient glow in card */}
             <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -260,17 +334,17 @@ export function NationalMapShareModal({
               </div>
             </div>
 
-            {/* The Bangladesh SVG Map */}
-            <div className="relative z-10 w-full max-w-[280px] sm:max-w-[320px] mx-auto aspect-[1555/2140] flex items-center justify-center py-1">
+            {/* The FULL Bangladesh SVG Map Frame */}
+            <div className="relative z-10 w-full max-w-[290px] sm:max-w-[330px] mx-auto aspect-[1555/2140] flex items-center justify-center p-2.5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800 shadow-inner">
               <Manchitro
-                items={activeCanonicalDistricts}
+                items={allCanonicalDistricts}
                 className="w-full h-full flex items-center justify-center relative pointer-events-none"
-                svgClassName="w-full h-auto"
+                svgClassName="share-card-map-svg w-full h-auto drop-shadow-md"
                 colors={{
                   base: '#1e293b',
                   active: '#10b981',
                   selected: '#10b981',
-                  stroke: 'rgba(255, 255, 255, 0.25)',
+                  stroke: 'rgba(255, 255, 255, 0.38)',
                   selectedStroke: '#ffffff',
                 }}
                 renderSelected={() => null}
@@ -278,8 +352,20 @@ export function NationalMapShareModal({
               />
             </div>
 
+            {/* Clear Legend Bar */}
+            <div className="relative z-10 flex items-center justify-center gap-4 text-[10px] text-slate-300 py-1 bg-slate-950/70 rounded-xl border border-white/5">
+              <span className="flex items-center gap-1.5 font-bold text-emerald-400">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
+                ঘুরেছি: {visitedCount} জেলা
+              </span>
+              <span className="flex items-center gap-1.5 font-medium text-slate-400">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-700 border border-white/20" />
+                বাকি: {64 - visitedCount} জেলা
+              </span>
+            </div>
+
             {/* Division Breakdown Pills */}
-            <div className="relative z-10 grid grid-cols-4 gap-1.5 pt-1">
+            <div className="relative z-10 grid grid-cols-4 gap-1.5 pt-0.5">
               {DIVISION_META.map((div) => {
                 const count = divisionCounts[div.slug] || 0;
                 const isComplete = count === div.total;

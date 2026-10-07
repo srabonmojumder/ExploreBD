@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Manchitro, resolveDistrict, DISTRICTS, ValidDistrict } from 'manchitro';
 import { District } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
+import { useAppStore } from '@/stores/useAppStore';
 import { useMounted } from '@/hooks/useMounted';
 import {
   Compass,
@@ -195,10 +196,12 @@ export function BangladeshInteractiveMap({
       // If the division is already selected: unselect it!
       setSelectedDivisionSlug(null);
       setSelectedDistrictName(null);
+      useAppStore.getState().setSelectedDivisionSlug(null);
     } else {
       // Select this division and focus the clicked district
       setSelectedDivisionSlug(divSlug);
       setSelectedDistrictName(district);
+      useAppStore.getState().setSelectedDivisionSlug(divSlug);
     }
   };
 
@@ -210,8 +213,10 @@ export function BangladeshInteractiveMap({
     if (selectedDivisionSlug === slug || slug === '') {
       setSelectedDivisionSlug(null);
       setSelectedDistrictName(null);
+      useAppStore.getState().setSelectedDivisionSlug(null);
     } else {
       setSelectedDivisionSlug(slug);
+      useAppStore.getState().setSelectedDivisionSlug(slug);
       const divInfo = divisionDataMap.get(slug);
       if (divInfo && divInfo.canonicalNames.length > 0) {
         setSelectedDistrictName(divInfo.canonicalNames[0]);
@@ -271,43 +276,31 @@ export function BangladeshInteractiveMap({
     <div className="relative flex flex-col lg:flex-row gap-6 items-stretch rounded-3xl glass-card border border-white/10 p-4 sm:p-7 overflow-hidden shadow-2xl">
       {/* Dynamic Scoped CSS for Manchitro SVG styling */}
       <style>{`
+        /* Base styling: ALL 64 districts of Bangladesh are clearly visible and defined */
         .manchitro-interactive-svg g path {
           transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
           cursor: pointer !important;
+          fill: #1e293b !important;
+          stroke: rgba(255, 255, 255, 0.28) !important;
+          stroke-width: 1.2px !important;
+          opacity: 1 !important;
         }
 
-        /* Dim outside districts when a division is selected */
-        ${
-          selectedDivisionSlug
-            ? `
-          .manchitro-interactive-svg g path {
-            opacity: 0.35 !important;
-            fill: #0f172a !important;
-            stroke: rgba(255, 255, 255, 0.1) !important;
-          }
-        `
-            : ''
-        }
-
-        /* Visited districts */
+        /* Visited districts across ALL of Bangladesh: distinct rich emerald green */
         ${visitedCanonicalDistricts
           .map(
             (name) => `
           .manchitro-interactive-svg g[aria-label="${name}"] path {
-            fill: ${selectedDivisionSlug ? '#065f46' : '#047857'} !important;
+            fill: #047857 !important;
             stroke: #10b981 !important;
-            stroke-width: 1.4px !important;
-            opacity: ${
-              selectedDivisionSlug && !selectedDivisionCanonicalNames.includes(name)
-                ? 0.35
-                : 1
-            } !important;
+            stroke-width: 1.6px !important;
+            opacity: 1 !important;
           }
         `
           )
           .join('\n')}
 
-        /* Selected division districts glow */
+        /* Selected division districts: Highlighted with vibrant Cyan / Emerald glow while whole map stays visible! */
         ${
           selectedDivisionSlug
             ? selectedDivisionCanonicalNames
@@ -315,12 +308,12 @@ export function BangladeshInteractiveMap({
                   const isVisited = visitedCanonicalDistricts.includes(name);
                   return `
             .manchitro-interactive-svg g[aria-label="${name}"] path {
-              fill: ${isVisited ? '#059669' : '#0e7490'} !important;
-              stroke: ${isVisited ? '#34d399' : '#22d3ee'} !important;
-              stroke-width: 2.4px !important;
+              fill: ${isVisited ? '#059669' : '#0891b2'} !important;
+              stroke: ${isVisited ? '#34d399' : '#38bdf8'} !important;
+              stroke-width: 2.8px !important;
               opacity: 1 !important;
-              filter: drop-shadow(0 0 10px ${
-                isVisited ? 'rgba(52, 211, 153, 0.75)' : 'rgba(34, 211, 238, 0.75)'
+              filter: drop-shadow(0 0 14px ${
+                isVisited ? 'rgba(52, 211, 153, 0.9)' : 'rgba(56, 189, 248, 0.9)'
               }) !important;
             }
           `;
@@ -336,9 +329,9 @@ export function BangladeshInteractiveMap({
           .manchitro-interactive-svg g[aria-label="${selectedDistrictName}"] path {
             fill: #f59e0b !important;
             stroke: #ffffff !important;
-            stroke-width: 3px !important;
+            stroke-width: 3.2px !important;
             opacity: 1 !important;
-            filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.95)) !important;
+            filter: drop-shadow(0 0 16px rgba(245, 158, 11, 1)) !important;
           }
         `
             : ''
@@ -353,7 +346,7 @@ export function BangladeshInteractiveMap({
             stroke: #ffffff !important;
             stroke-width: 3.2px !important;
             opacity: 1 !important;
-            filter: drop-shadow(0 0 16px rgba(251, 191, 36, 1)) !important;
+            filter: drop-shadow(0 0 18px rgba(251, 191, 36, 1)) !important;
           }
         `
             : ''
@@ -511,7 +504,7 @@ export function BangladeshInteractiveMap({
                   <span className="w-2 h-2 rounded-full bg-cyan-400" /> নির্বাচিত বিভাগ
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" /> পিন
+                  <span className="w-2 h-2 rounded-full bg-slate-500 border border-white/30" /> সম্পূর্ণ বাংলাদেশ দৃশ্যমান
                 </span>
               </div>
             </div>
@@ -519,7 +512,7 @@ export function BangladeshInteractiveMap({
         </div>
 
         {/* Manchitro SVG Map Canvas Container with Zoom Controls */}
-        <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-950/40 border border-white/5 min-h-[380px] sm:min-h-[480px]">
+        <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 border border-slate-800 shadow-inner min-h-[380px] sm:min-h-[480px]">
           {/* Floating Zoom Controls Bar */}
           <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 p-1 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-white/10 shadow-xl">
             <button
