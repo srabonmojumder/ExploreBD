@@ -176,10 +176,10 @@ export function DistrictSpotTracker({
             <button
               type="button"
               onClick={() => setActiveTab('ALL')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all outline-none focus:outline-none select-none border ${
                 activeTab === 'ALL'
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 ring-1 ring-emerald-400'
-                  : 'glass-card text-slate-300 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 border-emerald-400'
+                  : 'glass-card text-slate-300 hover:text-white border-white/5'
               }`}
             >
               সকল স্থান ({places.length})
@@ -188,10 +188,10 @@ export function DistrictSpotTracker({
             <button
               type="button"
               onClick={() => setActiveTab('VISITED')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all outline-none focus:outline-none select-none border ${
                 activeTab === 'VISITED'
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 ring-1 ring-emerald-400'
-                  : 'glass-card text-slate-300 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 border-emerald-400'
+                  : 'glass-card text-slate-300 hover:text-white border-white/5'
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -201,10 +201,10 @@ export function DistrictSpotTracker({
             <button
               type="button"
               onClick={() => setActiveTab('UNVISITED')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all outline-none focus:outline-none select-none border ${
                 activeTab === 'UNVISITED'
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 ring-1 ring-emerald-400'
-                  : 'glass-card text-slate-300 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 border-emerald-400'
+                  : 'glass-card text-slate-300 hover:text-white border-white/5'
               }`}
             >
               <Circle className="w-3.5 h-3.5 text-slate-400" />

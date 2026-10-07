@@ -96,10 +96,10 @@ function PlacesContent() {
                 key={cat.label}
                 type="button"
                 onClick={() => setSelectedCategory(cat.value)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all outline-none focus:outline-none select-none border ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/60 ring-1 ring-emerald-400'
-                    : 'glass-card text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/60 border-emerald-400'
+                    : 'glass-card text-slate-300 hover:text-white hover:bg-slate-800 border-white/5'
                 }`}
               >
                 {cat.label}

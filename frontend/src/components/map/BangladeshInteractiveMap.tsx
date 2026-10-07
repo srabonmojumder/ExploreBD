@@ -388,10 +388,10 @@ export function BangladeshInteractiveMap({
                 key={div.label}
                 type="button"
                 onClick={() => handleDivisionTabClick(div.slug)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 outline-none focus:outline-none select-none border ${
                   isActive
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950/60 ring-2 ring-emerald-400/80 scale-[1.03]'
-                    : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/5'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950/60 border-emerald-400'
+                    : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border-white/10'
                 }`}
               >
                 {div.slug !== '' && <Layers className="w-3 h-3 text-teal-300" />}
@@ -729,12 +729,12 @@ export function BangladeshInteractiveMap({
                         onClick={() => {
                           if (canon) setSelectedDistrictName(canon);
                         }}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all ${
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all outline-none focus:outline-none select-none border ${
                           isFocused
-                            ? 'bg-amber-500 text-slate-950 ring-2 ring-white font-bold shadow-md'
+                            ? 'bg-amber-400 text-slate-950 font-black border-amber-200 shadow-md shadow-amber-500/20'
                             : isVisited
-                            ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60'
-                            : 'bg-slate-800/80 border border-white/5 text-slate-300 hover:bg-slate-700'
+                            ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300 hover:bg-emerald-900/70 hover:border-emerald-400'
+                            : 'bg-slate-800/80 border-slate-700/60 text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-500'
                         }`}
                       >
                         {isVisited && <Check className="w-3 h-3 text-emerald-400" />}

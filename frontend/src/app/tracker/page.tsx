@@ -220,10 +220,10 @@ export default function TravelTrackerPage() {
                   key={div.label}
                   type="button"
                   onClick={() => setSelectedDivision(div.slug)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all outline-none focus:outline-none select-none border ${
                     isActive
-                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 ring-1 ring-emerald-400'
-                      : 'glass-card text-slate-300 hover:text-white hover:bg-slate-800'
+                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50 border-emerald-400'
+                      : 'glass-card text-slate-300 hover:text-white hover:bg-slate-800 border-white/5'
                   }`}
                 >
                   {div.label}
