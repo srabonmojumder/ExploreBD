@@ -47,3 +47,73 @@
 .animate-pulse-subtle {
   animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Sleek Cyber/Modern Glitch & Light Sweep Shimmer Effect for Buttons */
+.btn-glitch {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 0.5rem !important; /* Clean rounded-lg (8px), no bubbly radius */
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease !important;
+  transform: none !important;
+}
+
+.btn-glitch:hover,
+.btn-glitch:active,
+.btn-glitch:focus {
+  transform: none !important; /* Strictly NO transform scale jumping on hover */
+}
+
+/* Glitch sweep beam across the button surface */
+.btn-glitch::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -160%;
+  width: 75%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 15%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(52, 211, 153, 0.6) 75%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 20;
+  /* Page reload trigger: sweeps automatically once on page load */
+  animation: btn-glitch-sweep 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s 1;
+}
+
+/* Hover trigger: sweeps across on mouse hover without scale transform */
+.btn-glitch:hover::after {
+  animation: btn-glitch-sweep 0.75s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.btn-glitch:hover {
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+}
+
+@keyframes btn-glitch-sweep {
+  0% {
+    left: -160%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.8));
+  }
+  50% {
+    left: 45%;
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(52, 211, 153, 1));
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    left: 200%;
+    opacity: 0;
+  }
+}

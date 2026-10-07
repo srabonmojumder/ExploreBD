@@ -222,7 +222,7 @@ export default function PlaceDetailPage({
                       category: place.category,
                     })
                   }
-                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm shadow-xl shadow-emerald-950/60 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
+                  className="px-5 py-3 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm shadow-xl shadow-emerald-950/60 flex items-center gap-2 transition-colors"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>ঘুরেছি? লগ করুন</span>

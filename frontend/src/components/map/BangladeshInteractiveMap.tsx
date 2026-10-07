@@ -481,7 +481,7 @@ export function BangladeshInteractiveMap({
                   setSelectedDivisionSlug(null);
                   setSelectedDistrictName(null);
                 }}
-                className="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-all ml-auto hover:scale-105 active:scale-95"
+                className="px-3 py-1.5 rounded-lg btn-glitch bg-slate-800/90 hover:bg-slate-700 border border-white/20 text-white text-xs font-bold flex items-center gap-1.5 ml-auto"
               >
                 <X className="w-3.5 h-3.5 text-amber-400" />
                 <span>আনসিলেক্ট করুন</span>
@@ -645,7 +645,7 @@ export function BangladeshInteractiveMap({
           {onOpenShareModal && (
             <button
               onClick={onOpenShareModal}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-3 px-4 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 border border-emerald-400/40"
             >
               <Share2 className="w-4 h-4 text-emerald-200" />
               <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার করুন</span>
@@ -767,9 +767,9 @@ export function BangladeshInteractiveMap({
                   <button
                     type="button"
                     onClick={() => toggleDistrictVisit(selectedDistrictObj.slug)}
-                    className={`w-full py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                    className={`w-full py-2.5 px-3 rounded-lg btn-glitch font-bold text-xs flex items-center justify-center gap-1.5 ${
                       isSelectedDistrictVisited
-                        ? 'bg-red-950/60 border border-red-500/40 text-red-300 hover:bg-red-900/60'
+                        ? 'bg-red-950/70 border border-red-500/50 text-red-300 hover:bg-red-900/70'
                         : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-950/60'
                     }`}
                   >
@@ -788,7 +788,7 @@ export function BangladeshInteractiveMap({
 
                   <Link
                     href={`/districts/${selectedDistrictObj.slug}`}
-                    className="w-full py-2 px-3 rounded-xl bg-slate-900 border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    className="w-full py-2.5 px-3 rounded-lg btn-glitch bg-slate-900 border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5"
                   >
                     <span>জেলার স্পটগুলো দেখুন</span>
                     <ExternalLink className="w-3 h-3 text-emerald-400" />
@@ -799,7 +799,7 @@ export function BangladeshInteractiveMap({
               {/* Explore Division Spots Link */}
               <Link
                 href={`/districts?division=${selectedDivisionInfo.slug}`}
-                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-teal-900/60 to-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400 text-cyan-200 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all block text-center"
+                className="w-full py-2.5 px-3 rounded-lg btn-glitch bg-gradient-to-r from-teal-900/70 to-cyan-900/70 border border-cyan-500/40 hover:border-cyan-400 text-cyan-200 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 block text-center"
               >
                 <span>{selectedDivisionInfo.bnName} বিভাগের সব স্পট দেখুন</span>
                 <ExternalLink className="w-3 h-3 text-cyan-400" />

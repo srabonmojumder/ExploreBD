@@ -109,9 +109,9 @@ export function Footer() {
                   href="https://www.facebook.com/sraabonmozumder"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-950/60 hover:bg-blue-900/70 border border-blue-500/30 text-blue-300 text-xs font-semibold transition-all hover:scale-[1.02] group"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg btn-glitch bg-blue-950/60 hover:bg-blue-900/70 border border-blue-500/30 text-blue-300 text-xs font-semibold transition-colors group"
                 >
-                  <Facebook className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                  <Facebook className="w-4 h-4 text-blue-400" />
                   <span>Facebook Profile</span>
                 </a>
 
@@ -120,9 +120,9 @@ export function Footer() {
                   href="https://wa.me/8801827621312"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-all hover:scale-[1.02] group"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg btn-glitch bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-colors group"
                 >
-                  <MessageCircle className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <MessageCircle className="w-4 h-4 text-emerald-400" />
                   <span>WhatsApp: 01827621312</span>
                 </a>
               </div>

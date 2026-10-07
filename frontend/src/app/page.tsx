@@ -53,7 +53,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
               href="/tracker"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 border border-emerald-400/40"
             >
               <Compass className="w-4 h-4" />
               <span>আমার ভ্রমণ ট্র্যাকার (ম্যাপ ও কার্ড)</span>
@@ -62,7 +62,7 @@ export default function HomePage() {
 
             <Link
               href="/districts"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl glass-card hover:bg-slate-800 text-slate-200 font-semibold text-sm border border-white/10 flex items-center justify-center gap-2 transition-all"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-lg btn-glitch glass-card hover:bg-slate-800 text-slate-200 font-semibold text-sm border border-white/10 flex items-center justify-center gap-2"
             >
               <MapPin className="w-4 h-4 text-emerald-400" />
               <span>৬৪ জেলা অন্বেষণ</span>

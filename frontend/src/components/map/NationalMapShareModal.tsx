@@ -407,7 +407,7 @@ export function NationalMapShareModal({
             <button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+              className="w-full py-3 px-4 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 border border-emerald-400/40 disabled:opacity-50"
             >
               <Download className="w-4 h-4" />
               <span>{isDownloading ? 'ইমেজ তৈরি হচ্ছে...' : 'ডাউনলোড ইমেজ (PNG)'}</span>
@@ -416,7 +416,7 @@ export function NationalMapShareModal({
             {/* Copy Image Button */}
             <button
               onClick={handleCopy}
-              className="w-full py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-3 px-4 rounded-lg btn-glitch bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold text-xs flex items-center justify-center gap-2"
             >
               {isCopied ? (
                 <>
@@ -437,13 +437,13 @@ export function NationalMapShareModal({
             <span className="text-xs text-slate-400 font-medium">সরাসরি শেয়ার করুন:</span>
             <button
               onClick={handleShareWhatsApp}
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-1.5 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5"
             >
               <span>WhatsApp</span>
             </button>
             <button
               onClick={handleShareFacebook}
-              className="px-3.5 py-1.5 rounded-xl bg-blue-950/80 hover:bg-blue-900 border border-blue-500/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-1.5 rounded-lg btn-glitch bg-blue-950/80 hover:bg-blue-900 border border-blue-500/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5"
             >
               <span>Facebook</span>
             </button>

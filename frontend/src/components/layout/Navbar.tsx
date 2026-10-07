@@ -70,7 +70,7 @@ export function Navbar() {
           <div className="hidden sm:flex items-center gap-3">
             <Link
               href="/tracker"
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300 transition-all hover:scale-105"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300 transition-colors"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               {visitedCount > 0 ? (
@@ -82,7 +82,7 @@ export function Navbar() {
 
             <Link
               href="/tracker"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-sm font-bold text-white shadow-lg shadow-emerald-950/60 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
+              className="px-4 py-2 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-sm font-bold text-white shadow-lg shadow-emerald-950/60 flex items-center gap-2 border border-emerald-400/30"
             >
               <Compass className="w-4 h-4" />
               <span>অন্বেষণ শুরু করুন</span>

@@ -143,7 +143,7 @@ export function DistrictSpotTracker({
               <button
                 type="button"
                 onClick={() => setIsShareModalOpen(true)}
-                className="py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95"
+                className="py-3 px-5 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 border border-emerald-400/40"
               >
                 <Share2 className="w-4 h-4" />
                 <span>সোশ্যাল কার্ড বানান</span>

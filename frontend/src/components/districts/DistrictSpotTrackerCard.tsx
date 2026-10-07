@@ -170,7 +170,7 @@ export function DistrictSpotTrackerCard({
             <button
               type="button"
               onClick={handleToggle}
-              className="w-full py-2.5 px-3 rounded-xl bg-slate-800/80 hover:bg-emerald-600/90 text-slate-200 hover:text-white border border-white/10 hover:border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-2.5 px-3 rounded-lg btn-glitch bg-slate-800/80 hover:bg-emerald-600/90 text-slate-200 hover:text-white border border-white/10 hover:border-emerald-500/40 text-xs font-semibold flex items-center justify-center gap-2"
             >
               <Check className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white" />
               <span>ঘুরেছি? এখানে ক্লিক করুন</span>

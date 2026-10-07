@@ -28,7 +28,7 @@ export default function NotFound() {
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/"
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/60 transition-all hover:scale-105"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/60 transition-colors"
           >
             <Home className="w-4 h-4" />
             <span>হোমে ফিরে যান</span>
@@ -36,7 +36,7 @@ export default function NotFound() {
 
           <Link
             href="/tracker"
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-lg btn-glitch bg-slate-900 border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
           >
             <MapPin className="w-4 h-4 text-emerald-400" />
             <span>ভ্রমণ ট্র্যাকার</span>

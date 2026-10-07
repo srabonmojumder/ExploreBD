@@ -375,7 +375,7 @@ explorebd.com/districts/${districtSlug}`;
           <button
             type="button"
             onClick={handleCopyCaption}
-            className="flex-1 py-3 px-4 rounded-xl glass-card hover:bg-slate-800 text-slate-200 text-xs font-semibold border border-white/10 flex items-center justify-center gap-2 transition-colors"
+            className="flex-1 py-3 px-4 rounded-lg btn-glitch glass-card hover:bg-slate-800 text-slate-200 text-xs font-semibold border border-white/10 flex items-center justify-center gap-2 transition-colors"
           >
             {isCopied ? (
               <>
@@ -394,7 +394,7 @@ explorebd.com/districts/${districtSlug}`;
             type="button"
             onClick={handleDownloadImage}
             disabled={isGenerating}
-            className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            className="flex-1 py-3 px-4 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
             <span>ইমেজ ডাউনলোড করুন (PNG)</span>
