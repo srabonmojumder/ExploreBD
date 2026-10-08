@@ -61,7 +61,7 @@ const DIVISIONS: DivisionData[] = [
     slug: 'dhaka',
     code: 'DHK',
     description: 'The historic capital division with centuries-old Mughal architecture, vibrant rivers, royal palaces, and bustling cultural crossroads.',
-    image: 'https://images.unsplash.com/photo-1609137144822-0d1279a0cf34?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80',
   },
   {
     name: 'Khulna',
@@ -126,8 +126,7 @@ const DISTRICTS: DistrictData[] = [
   { name: 'Sunamganj', bnName: 'সুনামগঞ্জ', slug: 'sunamganj', divisionSlug: 'sylhet', description: 'Fabulous Tanguar Haor wetland, Shimul Bagan, and turquoise Jadukata river.', coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80', latitude: 25.0658, longitude: 91.3950 },
   { name: 'Habiganj', bnName: 'হবিগঞ্জ', slug: 'habiganj', divisionSlug: 'sylhet', description: 'Satchhari National Park, tea gardens, and historical mosques.', coverImage: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&q=80', latitude: 24.3749, longitude: 91.4155 },
 
-  // 3. Dhaka Division (13 districts)
-  { name: 'Dhaka', bnName: 'ঢাকা', slug: 'dhaka', divisionSlug: 'dhaka', description: 'Megacity of vibrant history, Lalbagh Fort, and Ahsan Manzil palace.', coverImage: 'https://images.unsplash.com/photo-1609137144822-0d1279a0cf34?auto=format&fit=crop&w=800&q=80', latitude: 23.8103, longitude: 90.4125 },
+  { name: 'Dhaka', bnName: 'ঢাকা', slug: 'dhaka', divisionSlug: 'dhaka', description: 'Megacity of vibrant history, Lalbagh Fort, and Ahsan Manzil palace.', coverImage: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80', latitude: 23.8103, longitude: 90.4125 },
   { name: 'Gazipur', bnName: 'গাজীপুর', slug: 'gazipur', divisionSlug: 'dhaka', description: 'Bhawal National Park, wilderness resorts, and wildlife safari parks.', coverImage: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80', latitude: 23.9999, longitude: 90.4203 },
   { name: 'Narayanganj', bnName: 'নারায়ণগঞ্জ', slug: 'narayanganj', divisionSlug: 'dhaka', description: 'Historic Panam Nagar, Sonargaon folk art museum, and river harbor.', coverImage: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80', latitude: 23.6238, longitude: 90.5000 },
   { name: 'Tangail', bnName: 'টাঙ্গাইল', slug: 'tangail', divisionSlug: 'dhaka', description: 'Renowned for handmade sarees, Mohera Zamindar house, and Atia Mosque.', coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80', latitude: 24.2513, longitude: 89.9167 },

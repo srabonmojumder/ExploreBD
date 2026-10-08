@@ -40,6 +40,18 @@ export default function DistrictDetailPage({
   const district = data?.data;
   const userStats = district && mounted ? getDistrictStats(district.slug, district.places.length) : null;
 
+  const [bannerSrc, setBannerSrc] = useState<string>('/cover.jpg');
+
+  React.useEffect(() => {
+    if (district?.coverImage) {
+      if (district.coverImage.includes('photo-1609137144822-0d1279a0cf34')) {
+        setBannerSrc('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1600&q=80');
+      } else {
+        setBannerSrc(district.coverImage);
+      }
+    }
+  }, [district?.coverImage]);
+
   return (
     <div className="space-y-12 pb-20">
       {/* Loading State */}
@@ -82,16 +94,14 @@ export default function DistrictDetailPage({
           {/* Hero Section */}
           <section className="relative min-h-[440px] sm:min-h-[480px] w-full overflow-hidden bg-slate-950 flex flex-col justify-end pt-12 pb-8 sm:pb-10">
             <Image
-              src={
-                district.coverImage ||
-                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80'
-              }
+              src={bannerSrc}
               alt={district.name}
               fill
               priority
-              className="object-cover opacity-45 scale-105"
+              onError={() => setBannerSrc('/cover.jpg')}
+              className="object-cover opacity-60 scale-105 transition-opacity duration-300"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/30" />
 
             <div className="relative max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-4">
               {/* Breadcrumbs */}

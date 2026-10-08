@@ -115,7 +115,7 @@ export default function HomePage() {
               <div className="relative aspect-[16/9] w-full overflow-hidden">
                 <video
                   ref={videoRef}
-                  src="/video/gemini_generated_video_95780bdf.mp4"
+                  src="/video/video2.mp4"
                   autoPlay
                   loop
                   muted={isMuted}
