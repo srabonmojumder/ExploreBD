@@ -23,7 +23,30 @@ import {
 export default function HomePage() {
   const [isPlaying, setIsPlaying] = React.useState(true);
   const [isMuted, setIsMuted] = React.useState(true);
+  const [scrollProgress, setScrollProgress] = React.useState(0);
   const videoRef = React.useRef<HTMLVideoElement>(null);
+  const videoSectionRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+          // Smooth scroll progress from 0 (at top) to 1 (scrolled 380px)
+          const targetScroll = 380;
+          const progress = Math.min(Math.max(scrollY / targetScroll, 0), 1);
+          setScrollProgress(progress);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -52,9 +75,9 @@ export default function HomePage() {
   return (
     <div className="space-y-16 sm:space-y-20 pb-20">
       {/* Hero Section */}
-      <section className="relative pt-8 sm:pt-16 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+      <section className="relative pt-8 sm:pt-16 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
         {/* Subtle Radial Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[320px] bg-gradient-to-tr from-emerald-500/15 to-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-gradient-to-tr from-emerald-500/15 to-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative text-center max-w-3xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs sm:text-sm font-semibold text-emerald-300">
@@ -108,52 +131,74 @@ export default function HomePage() {
               <div className="text-xs text-slate-400 font-medium">পর্যটন স্পট</div>
             </div>
           </div>
+        </div>
 
-          {/* Video Tour Banner */}
-          <div className="pt-6 max-w-4xl mx-auto">
-            <div className="relative rounded-2xl overflow-hidden border border-emerald-500/30 shadow-2xl shadow-emerald-950/80 bg-slate-950">
-              <div className="relative aspect-[16/9] w-full overflow-hidden">
-                <video
-                  ref={videoRef}
-                  src="/video/video2.mp4"
-                  autoPlay
-                  loop
-                  muted={isMuted}
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/20 pointer-events-none" />
+        {/* Video Tour Banner (Wide Cinematic Stage with Scroll Scale-Up) */}
+        <div ref={videoSectionRef} className="pt-10 sm:pt-14 max-w-5xl lg:max-w-6xl mx-auto w-full px-2 sm:px-4">
+          <div
+            style={{
+              transform: `scale(${0.90 + scrollProgress * 0.12})`,
+              transition: 'transform 120ms ease-out',
+              willChange: 'transform',
+            }}
+            className="relative rounded-2xl sm:rounded-3xl lg:rounded-[32px] overflow-hidden border border-emerald-500/40 shadow-2xl shadow-emerald-950/90 bg-slate-950 group ring-1 ring-white/10"
+          >
+            {/* Ambient Background Glow that responds to scroll */}
+            <div
+              style={{ opacity: 0.25 + scrollProgress * 0.35 }}
+              className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-600/20 blur-2xl pointer-events-none -z-10 transition-opacity duration-300"
+            />
 
-                {/* Video controls */}
-                <div className="absolute top-3.5 right-3.5 flex items-center gap-2 pointer-events-auto">
-                  <button
-                    type="button"
-                    onClick={togglePlay}
-                    className="p-2 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white hover:text-emerald-400 transition-colors shadow-lg"
-                    title={isPlaying ? 'Pause' : 'Play'}
-                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                  >
-                    {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleMute}
-                    className="p-2 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white hover:text-emerald-400 transition-colors shadow-lg"
-                    title={isMuted ? 'Unmute' : 'Mute'}
-                    aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-                  >
-                    {isMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-300" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
-                  </button>
+            <div className="relative aspect-[16/9] w-full overflow-hidden">
+              <video
+                ref={videoRef}
+                src="/video/video2.mp4"
+                autoPlay
+                loop
+                muted={isMuted}
+                playsInline
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/30 pointer-events-none" />
+
+              {/* Video controls */}
+              <div className="absolute top-4 right-4 flex items-center gap-2.5 pointer-events-auto z-10">
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="p-2.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white hover:text-emerald-400 hover:scale-105 transition-all shadow-lg"
+                  title={isPlaying ? 'Pause' : 'Play'}
+                  aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                >
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  className="p-2.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white hover:text-emerald-400 hover:scale-105 transition-all shadow-lg"
+                  title={isMuted ? 'Unmute' : 'Mute'}
+                  aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4 text-slate-300" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+                </button>
+              </div>
+
+              {/* Video Info Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex items-center justify-between pointer-events-none">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-bold text-white drop-shadow text-sm sm:text-base lg:text-lg">
+                      ৬৪ জেলার ডিজিটাল ভ্রমণ মানচিত্র 🇧🇩
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 hidden sm:block">
+                    ExploreBD এর সাথে আপনার স্মৃতিময় জেলাগুলো সংরক্ষণ করুন
+                  </p>
                 </div>
-
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-300 pointer-events-none">
-                  <span className="font-semibold text-white drop-shadow text-xs sm:text-sm">
-                    ৬৪ জেলার ডিজিটাল ভ্রমণ মানচিত্র 🇧🇩
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-emerald-400">
-                    ভিডিও ট্যুর
-                  </span>
-                </div>
+                <span className="px-3 py-1 rounded-full bg-emerald-950/80 backdrop-blur-md border border-emerald-500/40 text-xs font-semibold text-emerald-300 shadow-lg">
+                  ভিডিও প্রিভিউ
+                </span>
               </div>
             </div>
           </div>
