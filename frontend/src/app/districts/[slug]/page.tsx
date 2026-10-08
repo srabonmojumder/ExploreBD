@@ -125,9 +125,14 @@ export default function DistrictDetailPage({
                       {district.division.name} Division
                     </span>
                     {getDistrictUpazilas(district.slug).length > 0 && (
-                      <span className="px-3 py-1 rounded-full bg-slate-900/80 border border-white/10 text-xs font-semibold text-slate-300">
-                        🏛️ {getDistrictUpazilas(district.slug).length}টি উপজেলা ও থানা
-                      </span>
+                      <a
+                        href="#thanas"
+                        className="px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/40 hover:border-emerald-400 text-xs font-bold text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all shadow-md group cursor-pointer"
+                        title="উপজেলা ও থানা তালিকা দেখুন"
+                      >
+                        <span>🏛️ {getDistrictUpazilas(district.slug).length}টি উপজেলা ও থানা দেখুন</span>
+                        <ChevronDown className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-y-0.5 transition-transform" />
+                      </a>
                     )}
                     {district.bnName && (
                       <span className="text-xl sm:text-2xl font-bold text-slate-300 font-sans ml-1">

@@ -20,6 +20,8 @@ import {
   MapPin,
   ChevronDown,
   ChevronUp,
+  Search,
+  Building2,
 } from 'lucide-react';
 
 interface DistrictSpotTrackerProps {
@@ -42,6 +44,7 @@ export function DistrictSpotTracker({
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedUpazila, setSelectedUpazila] = useState<string>('ALL');
   const [showAllUpazilas, setShowAllUpazilas] = useState<boolean>(false);
+  const [upazilaSearch, setUpazilaSearch] = useState<string>('');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // 1. Get official Upazilas/Thanas for this district
@@ -80,6 +83,27 @@ export function DistrictSpotTracker({
     }
     return list;
   }, [places, districtSlug, districtName, districtBnName]);
+
+  // 3. Count how many tourist spots each upazila has
+  const upazilaSpotCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allPlaces.forEach((p) => {
+      const up = resolvePlaceUpazila(districtSlug, p.title || p.name, p.thana || p.upazila);
+      if (up) {
+        counts[up] = (counts[up] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [allPlaces, districtSlug]);
+
+  // 4. Search & filter upazilas list
+  const filteredUpazilas = useMemo(() => {
+    if (!upazilaSearch.trim()) return districtUpazilas;
+    const q = upazilaSearch.trim().toLowerCase();
+    return districtUpazilas.filter(
+      (u) => u.name.toLowerCase().includes(q) || u.bnName.toLowerCase().includes(q)
+    );
+  }, [districtUpazilas, upazilaSearch]);
 
   const defaultStats = {
     totalPlaces: allPlaces.length,
@@ -226,26 +250,68 @@ export function DistrictSpotTracker({
 
       {/* 2. Upazila & Thana Directory & Quick Interactive Filter */}
       {districtUpazilas.length > 0 && (
-        <div className="glass-card rounded-2xl p-4 sm:p-5 border border-white/10 space-y-3.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-emerald-400" />
-              <h4 className="font-bold text-sm text-white">
-                {displayName}-এর উপজেলা ও থানা সমূহ ({districtUpazilas.length}টি)
-              </h4>
+        <div id="thanas" className="scroll-mt-24 glass-card rounded-2xl p-5 sm:p-6 border border-emerald-500/20 space-y-4 shadow-xl bg-slate-900/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                <Building2 className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div>
+                <h4 className="font-bold text-sm sm:text-base text-white flex items-center gap-2">
+                  <span>{displayName}-এর সকল থানা ও উপজেলা</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold">
+                    {districtUpazilas.length}টি
+                  </span>
+                </h4>
+                <p className="text-[11px] text-slate-400">
+                  যেকোনো থানা বা উপজেলায় ক্লিক করে সেখানকার দর্শনীয় স্থানগুলো দেখুন:
+                </p>
+              </div>
             </div>
-            {districtUpazilas.length > 8 && (
-              <button
-                type="button"
-                onClick={() => setShowAllUpazilas(!showAllUpazilas)}
-                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
-              >
-                <span>{showAllUpazilas ? 'কম দেখুন' : `সবগুলো দেখুন (+${districtUpazilas.length - 8})`}</span>
-                {showAllUpazilas ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-              </button>
-            )}
+
+            {/* Thana quick search */}
+            <div className="relative w-full sm:w-64">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={upazilaSearch}
+                onChange={(e) => {
+                  setUpazilaSearch(e.target.value);
+                  if (e.target.value) setShowAllUpazilas(true);
+                }}
+                placeholder="থানা খুঁজুন (যেমন: সাভার, মিরপুর)..."
+                className="w-full pl-9 pr-8 py-1.5 rounded-xl bg-slate-950/90 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+              {upazilaSearch && (
+                <button
+                  type="button"
+                  onClick={() => setUpazilaSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs px-1"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
 
+          {/* Active thana filter indicator banner */}
+          {selectedUpazila !== 'ALL' && (
+            <div className="flex items-center justify-between p-2.5 px-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-200">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                <span>বর্তমানে <strong>{selectedUpazila}</strong> থানার স্থানসমূহ দেখাচ্ছে ({filteredPlaces.length}টি স্থান)</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedUpazila('ALL')}
+                className="text-[11px] underline text-amber-300 hover:text-white font-semibold ml-2 shrink-0"
+              >
+                সব থানা দেখুন
+              </button>
+            </div>
+          )}
+
+          {/* Thanas Pills */}
           <div className="flex flex-wrap gap-1.5">
             <button
               type="button"
@@ -258,24 +324,57 @@ export function DistrictSpotTracker({
             >
               সব থানা ({districtUpazilas.length})
             </button>
-            {(showAllUpazilas ? districtUpazilas : districtUpazilas.slice(0, 8)).map((u) => {
+            {(upazilaSearch.trim() || showAllUpazilas
+              ? filteredUpazilas
+              : filteredUpazilas.slice(0, 14)
+            ).map((u) => {
               const isSelected = selectedUpazila === u.bnName;
+              const spotCount = upazilaSpotCounts[u.bnName] || 0;
               return (
                 <button
                   key={u.slug}
                   type="button"
+                  title={`${u.bnName} (${u.name})`}
                   onClick={() => setSelectedUpazila(isSelected ? 'ALL' : u.bnName)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1.5 ${
                     isSelected
                       ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
-                      : 'bg-slate-900/60 border-white/5 hover:border-emerald-500/30 text-slate-300 hover:text-white'
+                      : spotCount > 0
+                      ? 'bg-slate-900/90 border-emerald-500/30 text-emerald-200 hover:border-emerald-400 hover:text-white'
+                      : 'bg-slate-900/60 border-white/5 hover:border-white/20 text-slate-300 hover:text-white'
                   }`}
                 >
-                  {u.bnName}
+                  <span>{u.bnName}</span>
+                  {spotCount > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      isSelected ? 'bg-black/20 text-white' : 'bg-emerald-500/20 text-emerald-300'
+                    }`}>
+                      {spotCount}
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
+
+          {/* Expand/Collapse footer */}
+          {!upazilaSearch.trim() && filteredUpazilas.length > 14 && (
+            <div className="pt-1 flex items-center justify-between border-t border-white/5 text-xs text-slate-400">
+              <span className="text-[11px]">
+                {showAllUpazilas
+                  ? `মোট ${filteredUpazilas.length}টি থানা প্রদর্শিত`
+                  : `প্রথম ১৪টি প্রদর্শিত (বাকি আরও ${filteredUpazilas.length - 14}টি)`}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowAllUpazilas(!showAllUpazilas)}
+                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+              >
+                <span>{showAllUpazilas ? 'সংক্ষিপ্ত করুন' : `সকল ${filteredUpazilas.length}টি থানা দেখুন`}</span>
+                {showAllUpazilas ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
