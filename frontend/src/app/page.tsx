@@ -79,17 +79,17 @@ export default function HomePage() {
               href="/tracker"
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-base shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2.5 border border-emerald-400/30 transition-all hover:scale-[1.02]"
             >
-              <Compass className="w-5 h-5" />
-              <span>ভ্রমণ ম্যাপ খুলুন (শুরু করুন)</span>
+              <Compass className="w-5 h-5 text-emerald-200" />
+              <span>আপনার ম্যাপ তৈরি করুন</span>
               <ChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
 
             <Link
-              href="/places"
+              href="/districts"
               className="w-full sm:w-auto px-7 py-4 rounded-xl glass-card hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-sm border border-white/10 flex items-center justify-center gap-2 transition-all"
             >
               <MapPin className="w-4 h-4 text-emerald-400" />
-              <span>দর্শনীয় স্পটগুলো দেখুন</span>
+              <span>৬৪ জেলা অন্বেষণ</span>
             </Link>
           </div>
 

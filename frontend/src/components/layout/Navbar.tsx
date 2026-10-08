@@ -111,7 +111,7 @@ export function Navbar() {
                 {visitedCount > 0 ? (
                   <span>{visitedCount}/৬৪ জেলা সম্পন্ন</span>
                 ) : (
-                  <span>ভ্রমণ ট্র্যাকার</span>
+                  <span>আপনার ম্যাপ তৈরি করুন</span>
                 )}
               </Link>
             </div>
@@ -223,7 +223,7 @@ export function Navbar() {
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 transition-all"
               >
                 <Compass className="w-4 h-4" />
-                <span>ম্যাপে ভ্রমণ ট্র্যাক করুন</span>
+                <span>আপনার ম্যাপ তৈরি করুন</span>
               </Link>
             </div>
           </div>
