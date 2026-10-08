@@ -88,7 +88,7 @@ export function DistrictSpotTracker({
   const upazilaSpotCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     allPlaces.forEach((p) => {
-      const up = resolvePlaceUpazila(districtSlug, p.title || p.name, p.thana || p.upazila);
+      const up = resolvePlaceUpazila(p, districtSlug);
       if (up) {
         counts[up] = (counts[up] || 0) + 1;
       }

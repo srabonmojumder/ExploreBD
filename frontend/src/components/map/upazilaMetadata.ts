@@ -706,10 +706,25 @@ export function resolvePlaceUpazila(
   },
   districtSlug: string
 ): string | null {
-  if (place.thana) return place.thana;
-  if (place.upazila) return place.upazila;
   const upazilas = getDistrictUpazilas(districtSlug);
-  if (!upazilas.length) return null;
+  if (!upazilas.length) return place.thana || place.upazila || null;
+
+  // 1. Check explicit thana or upazila property
+  const explicit = (place.thana || place.upazila || '').trim().toLowerCase();
+  if (explicit) {
+    const found = upazilas.find(
+      (u) =>
+        u.name.toLowerCase() === explicit ||
+        u.bnName.toLowerCase() === explicit ||
+        u.slug.toLowerCase() === explicit ||
+        explicit.includes(u.name.toLowerCase()) ||
+        explicit.includes(u.bnName)
+    );
+    if (found) return found.bnName;
+    return place.thana || place.upazila || null;
+  }
+
+  // 2. Search in place name, bnName, and description
   const text = `${place.name || ''} ${place.bnName || ''} ${place.description || ''}`.toLowerCase();
   for (const u of upazilas) {
     if (text.includes(u.name.toLowerCase()) || text.includes(u.bnName)) {
