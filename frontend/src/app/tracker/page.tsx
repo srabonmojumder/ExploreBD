@@ -139,100 +139,120 @@ export default function TravelTrackerPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 pb-24">
-      {/* 1. Hero Overview & National Tracker Summary */}
-      <section className="relative rounded-3xl glass-card p-6 sm:p-10 border border-emerald-500/30 overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-500/20 via-teal-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {/* 1. Hero Overview & National Tracker Summary (Hidden until user selects districts on map) */}
+      {visitedDistrictCount > 0 ? (
+        <section className="relative rounded-3xl glass-card p-6 sm:p-10 border border-emerald-500/30 overflow-hidden shadow-2xl animate-in fade-in duration-300">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-500/20 via-teal-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              <span>৬৪ জেলা ও সকল দর্শনীয় স্থান ভ্রমণ খতিয়ান</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-              বাংলাদেশের কতটুকু <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
-                ঘুরে দেখেছেন আপনি?
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              মানচিত্রের যেকোনো জেলায় ক্লিক করে <strong>ঘুরেছি</strong> মার্ক করুন। আপনার ভ্রমণের স্কোর স্বয়ংক্রিয়ভাবে হিসাব হবে এবং আপনি সুন্দর ট্রাভেল কার্ড ডাউনলোড করতে পারবেন!
-            </p>
-
-            {/* Custom Name Field & Share Button */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="flex items-center gap-2.5 flex-1">
-                <label className="text-xs text-slate-400 font-semibold whitespace-nowrap">
-                  আপনার নাম:
-                </label>
-                <input
-                  type="text"
-                  value={nameInput}
-                  onChange={(e) => {
-                    setNameInput(e.target.value);
-                    setTravelerName(e.target.value);
-                  }}
-                  placeholder="যেমন: তানভীর হাসান"
-                  className="px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 w-full placeholder:text-slate-500"
-                  maxLength={25}
-                />
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="space-y-4 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <span>৬৪ জেলা ও সকল দর্শনীয় স্থান ভ্রমণ খতিয়ান</span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsShareModalOpen(true)}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40 transition-all hover:scale-[1.02]"
-              >
-                <Share2 className="w-4 h-4 text-emerald-200" />
-                <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার</span>
-              </button>
-            </div>
-          </div>
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                বাংলাদেশের কতটুকু <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
+                  ঘুরে দেখেছেন আপনি?
+                </span>
+              </h1>
 
-          {/* National Stats Grid */}
-          <div className="grid grid-cols-2 gap-3.5 lg:w-96 shrink-0">
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-900/60 text-center">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                ঘুরে দেখা জেলা
-              </span>
-              <div className="text-3xl font-black text-white mt-1">
-                {visitedDistrictCount}
-                <span className="text-xs text-slate-500 font-normal"> / ৬৪</span>
-              </div>
-              <span className="text-[11px] text-emerald-400 font-semibold block mt-1">
-                {nationalPercentage}% জেলা সম্পন্ন
-              </span>
-            </div>
-
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-900/60 text-center">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                ঘুরে দেখা স্পট
-              </span>
-              <div className="text-3xl font-black text-teal-300 mt-1">
-                {totalVisitedPlaces}
-                <span className="text-xs text-teal-400/80 font-normal"> টি</span>
-              </div>
-              <span className="text-[11px] text-slate-400 font-medium block mt-1">
-                ব্যক্তিগত পরিদর্শন
-              </span>
-            </div>
-
-            <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-900/60 text-center col-span-2">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                সর্বমোট ভ্রমণ গণনা
-              </span>
-              <div className="text-4xl font-black text-amber-300 mt-1">
-                {totalVisitsCount} <span className="text-sm font-semibold text-amber-400/90">বার</span>
-              </div>
-              <p className="text-xs text-slate-400 mt-1">
-                নিজ জেলার পার্ক, ঝর্ণা বা বিচে একাধিকবার ভ্রমণ সহ
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                আপনার পছন্দের জেলাগুলোতে ক্লিক করে ভ্রমণ খতিয়ান তৈরি করুন। এবার আপনার নাম লিখে আকর্ষণীয় ফটো কার্ড ডাউনলোড ও শেয়ার করুন!
               </p>
+
+              {/* Custom Name Field & Share Button (Shown after selecting districts) */}
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="flex items-center gap-2.5 flex-1">
+                  <label className="text-xs text-slate-400 font-semibold whitespace-nowrap">
+                    আপনার নাম:
+                  </label>
+                  <input
+                    type="text"
+                    value={nameInput}
+                    onChange={(e) => {
+                      setNameInput(e.target.value);
+                      setTravelerName(e.target.value);
+                    }}
+                    placeholder="যেমন: তানভীর হাসান"
+                    className="px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 w-full placeholder:text-slate-500"
+                    maxLength={25}
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40 transition-all hover:scale-[1.02]"
+                >
+                  <Share2 className="w-4 h-4 text-emerald-200" />
+                  <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার</span>
+                </button>
+              </div>
+            </div>
+
+            {/* National Stats Grid */}
+            <div className="grid grid-cols-2 gap-3.5 lg:w-96 shrink-0">
+              <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-900/60 text-center">
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  ঘুরে দেখা জেলা
+                </span>
+                <div className="text-3xl font-black text-white mt-1">
+                  {visitedDistrictCount}
+                  <span className="text-xs text-slate-500 font-normal"> / ৬৪</span>
+                </div>
+                <span className="text-[11px] text-emerald-400 font-semibold block mt-1">
+                  {nationalPercentage}% জেলা সম্পন্ন
+                </span>
+              </div>
+
+              <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-900/60 text-center">
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  ঘুরে দেখা স্পট
+                </span>
+                <div className="text-3xl font-black text-teal-300 mt-1">
+                  {totalVisitedPlaces}
+                  <span className="text-xs text-teal-400/80 font-normal"> টি</span>
+                </div>
+                <span className="text-[11px] text-slate-400 font-medium block mt-1">
+                  ব্যক্তিগত পরিদর্শন
+                </span>
+              </div>
+
+              <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-900/60 text-center col-span-2">
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  সর্বমোট ভ্রমণ গণনা
+                </span>
+                <div className="text-4xl font-black text-amber-300 mt-1">
+                  {totalVisitsCount} <span className="text-sm font-semibold text-amber-400/90">বার</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  নিজ জেলার পার্ক, ঝর্ণা বা বিচে একাধিকবার ভ্রমণ সহ
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : (
+        /* Initial State Guide: Prompt user to first select map districts */
+        <section className="relative rounded-3xl glass-card p-6 sm:p-8 border border-emerald-500/20 bg-slate-900/60 overflow-hidden shadow-xl text-center space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span>বাংলাদেশ ভ্রমণ ট্র্যাকার</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+            প্রথমে নিচের মানচিত্রে আপনার ঘুরে দেখা জেলাগুলো সিলেক্ট করুন
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            মানচিত্রের যেকোনো জেলায় ক্লিক করে আপনার ভ্রমণ করা জেলাগুলো পিন করুন। জেলা নির্বাচন শুরু করলেই আপনার ভ্রমণ স্কোর ও ফটো কার্ড ডাউনলোডের অপশন দেখতে পাবেন!
+          </p>
+          <div className="pt-1 flex items-center justify-center gap-2 text-xs font-semibold text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>👇 নিচের মানচিত্রে ক্লিক করে শুরু করুন</span>
+          </div>
+        </section>
+      )}
 
       {/* 2. Interactive SVG Map of Bangladesh */}
       <section className="space-y-4">
