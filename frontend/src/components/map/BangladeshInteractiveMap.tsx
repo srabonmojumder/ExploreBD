@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Manchitro, resolveDistrict, DISTRICTS, ValidDistrict } from 'manchitro';
 import { District } from '@/lib/api-client';
@@ -72,7 +72,18 @@ export function BangladeshInteractiveMap({
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // High-performance 60FPS refs to avoid unnecessary re-renders during motion
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const zoomLevelRef = useRef(zoomLevel);
+  zoomLevelRef.current = zoomLevel;
+  const panRef = useRef(pan);
+  panRef.current = pan;
+
+  const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragStartPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const hasDraggedRef = useRef<boolean>(false);
+  const touchPinchDistRef = useRef<number | null>(null);
 
   // Map district slugs to canonical manchitro names and vice-versa
   const { slugToCanonical, canonicalToDistrict, divisionDataMap } = useMemo(() => {
@@ -223,6 +234,9 @@ export function BangladeshInteractiveMap({
    * DOES NOT unpin or unselect any other districts!
    */
   const handleSelectDistrict = (district: ValidDistrict) => {
+    // If the user was dragging/panning the map, ignore selection click!
+    if (hasDraggedRef.current) return;
+
     const d = canonicalToDistrict.get(district);
     if (!d) return;
 
@@ -260,8 +274,8 @@ export function BangladeshInteractiveMap({
     }
   };
 
-  // Zoom controls
-  const handleZoomIn = () => setZoomLevel((z) => Math.min(Number((z + 0.25).toFixed(2)), 2.5));
+  // Zoom controls (min: 1.0, max: 3.5)
+  const handleZoomIn = () => setZoomLevel((z) => Math.min(Number((z + 0.25).toFixed(2)), 3.5));
   const handleZoomOut = () => {
     setZoomLevel((z) => {
       const next = Math.max(Number((z - 0.25).toFixed(2)), 1);
@@ -274,37 +288,168 @@ export function BangladeshInteractiveMap({
     setPan({ x: 0, y: 0 });
   };
 
-  // Drag to pan when zoomed
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (zoomLevel > 1) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-    }
+  // Mouse drag: start dragging map on left-click
+  const handleMouseDownCapture = (e: React.MouseEvent) => {
+    if (e.button !== 0) return; // Only primary mouse button
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX - panRef.current.x, y: e.clientY - panRef.current.y };
+    dragStartPosRef.current = { x: e.clientX, y: e.clientY };
+    hasDraggedRef.current = false;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && zoomLevel > 1) {
-      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
-    }
-  };
-
-  const handleMouseUp = () => setIsDragging(false);
-
-  // Touch handlers for mobile pan
+  // Touch handlers for mobile pan & pinch-to-zoom
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (zoomLevel > 1 && e.touches.length === 1) {
+    if (e.touches.length === 1) {
       setIsDragging(true);
-      setDragStart({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y });
+      dragStartRef.current = {
+        x: e.touches[0].clientX - panRef.current.x,
+        y: e.touches[0].clientY - panRef.current.y,
+      };
+      dragStartPosRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+      hasDraggedRef.current = false;
+    } else if (e.touches.length === 2) {
+      setIsDragging(false);
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      touchPinchDistRef.current = dist;
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging && zoomLevel > 1 && e.touches.length === 1) {
-      setPan({ x: e.touches[0].clientX - dragStart.x, y: e.touches[0].clientY - dragStart.y });
+    if (e.touches.length === 1 && isDragging) {
+      const dx = e.touches[0].clientX - dragStartPosRef.current.x;
+      const dy = e.touches[0].clientY - dragStartPosRef.current.y;
+      if (Math.hypot(dx, dy) > 5) {
+        hasDraggedRef.current = true;
+      }
+      const newX = e.touches[0].clientX - dragStartRef.current.x;
+      const newY = e.touches[0].clientY - dragStartRef.current.y;
+      const z = zoomLevelRef.current;
+      const maxPanX = (z - 1) * 350 + 160;
+      const maxPanY = (z - 1) * 450 + 160;
+      setPan({
+        x: Math.min(Math.max(newX, -maxPanX), maxPanX),
+        y: Math.min(Math.max(newY, -maxPanY), maxPanY),
+      });
+    } else if (e.touches.length === 2 && touchPinchDistRef.current !== null) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const diff = dist - touchPinchDistRef.current;
+      touchPinchDistRef.current = dist;
+      setZoomLevel((prev) => {
+        const next = Math.min(Math.max(Number((prev + diff * 0.007).toFixed(2)), 1), 3.5);
+        if (next === 1) setPan({ x: 0, y: 0 });
+        return next;
+      });
     }
   };
 
-  const handleTouchEnd = () => setIsDragging(false);
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    touchPinchDistRef.current = null;
+    if (hasDraggedRef.current) {
+      setTimeout(() => {
+        hasDraggedRef.current = false;
+      }, 100);
+    }
+  };
+
+  // Global mousemove and mouseup listeners when dragging is active
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const dx = e.clientX - dragStartPosRef.current.x;
+      const dy = e.clientY - dragStartPosRef.current.y;
+      if (Math.hypot(dx, dy) > 5) {
+        hasDraggedRef.current = true;
+      }
+
+      const newX = e.clientX - dragStartRef.current.x;
+      const newY = e.clientY - dragStartRef.current.y;
+      const z = zoomLevelRef.current;
+      const maxPanX = (z - 1) * 350 + 160;
+      const maxPanY = (z - 1) * 450 + 160;
+
+      setPan({
+        x: Math.min(Math.max(newX, -maxPanX), maxPanX),
+        y: Math.min(Math.max(newY, -maxPanY), maxPanY),
+      });
+    };
+
+    const handleGlobalMouseUp = () => {
+      setIsDragging(false);
+      if (hasDraggedRef.current) {
+        setTimeout(() => {
+          hasDraggedRef.current = false;
+        }, 120);
+      }
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging]);
+
+  // Touchpad pinch-to-zoom and mouse wheel zoom listener (passive: false)
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      // If touchpad pinch gesture (ctrlKey is true)
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const factor = 0.03;
+        const delta = -e.deltaY * factor;
+        setZoomLevel((prev) => {
+          const next = Math.min(Math.max(Number((prev + delta).toFixed(2)), 1), 3.5);
+          if (next === 1) setPan({ x: 0, y: 0 });
+          return next;
+        });
+        return;
+      }
+
+      // Trackpad 2-finger scroll or mouse wheel
+      const delta = -e.deltaY * 0.0018;
+      const curZoom = zoomLevelRef.current;
+      const willZoom = (delta > 0 && curZoom < 3.5) || (delta < 0 && curZoom > 1);
+
+      if (willZoom) {
+        e.preventDefault();
+        setZoomLevel((prev) => {
+          const next = Math.min(Math.max(Number((prev + delta).toFixed(2)), 1), 3.5);
+          if (next === 1) {
+            setPan({ x: 0, y: 0 });
+          } else {
+            const maxPanX = (next - 1) * 350 + 160;
+            const maxPanY = (next - 1) * 450 + 160;
+            setPan((p) => ({
+              x: Math.min(Math.max(p.x, -maxPanX), maxPanX),
+              y: Math.min(Math.max(p.y, -maxPanY), maxPanY),
+            }));
+          }
+          return next;
+        });
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // Memoized, lightning-fast SVG stylesheet (0 re-parsing overhead on mouse moves)
   const dynamicMapStyles = useMemo(() => {
@@ -539,13 +684,19 @@ export function BangladeshInteractiveMap({
         </div>
 
         {/* Manchitro SVG Map Canvas Container with Zoom Controls */}
-        <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 border border-slate-800 shadow-inner min-h-[380px] sm:min-h-[480px]">
+        <div
+          ref={mapContainerRef}
+          onMouseDownCapture={handleMouseDownCapture}
+          className={`relative w-full flex-1 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 border border-slate-800 shadow-inner min-h-[380px] sm:min-h-[480px] select-none ${
+            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+          }`}
+        >
           {/* Floating Zoom Controls Bar */}
-          <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 p-1 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-white/10 shadow-xl">
+          <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5 p-1 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-white/10 shadow-xl pointer-events-auto">
             <button
               type="button"
               onClick={handleZoomIn}
-              disabled={zoomLevel >= 2.5}
+              disabled={zoomLevel >= 3.5}
               className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-emerald-600/30 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
               title="Zoom In (+)"
               aria-label="Zoom In"
@@ -581,7 +732,7 @@ export function BangladeshInteractiveMap({
 
           {/* Floating Selected Division Badge Overlay */}
           {selectedDivisionInfo && (
-            <div className="absolute top-3 left-3 z-30 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md border border-cyan-500/50 text-xs shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 max-w-[80%]">
+            <div className="absolute top-3 left-3 z-30 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/90 backdrop-blur-md border border-cyan-500/50 text-xs shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 max-w-[80%] pointer-events-auto">
               <Layers className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
               <div className="truncate">
                 <span className="font-bold text-white">
@@ -605,27 +756,28 @@ export function BangladeshInteractiveMap({
             </div>
           )}
 
+          {/* Bottom Gesture & Zoom Info Badge */}
+          <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-3.5 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/10 text-[10px] sm:text-[11px] text-slate-300 shadow-xl flex items-center gap-2 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span>ড্র্যাগ করে সরান • টাচপ্যাড বা স্ক্রলে জুম করুন ({Math.round(zoomLevel * 100)}%)</span>
+          </div>
+
           {/* Zoom & Pan Drag Area */}
           <div
-            className={`relative w-full max-w-[500px] aspect-[1555/2140] flex items-center justify-center py-2 select-none ${
-              zoomLevel > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-pointer'
+            className={`relative w-full max-w-[500px] aspect-[1555/2140] flex items-center justify-center py-2 select-none touch-none ${
+              isDragging ? 'cursor-grabbing' : 'cursor-grab'
             }`}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={() => {
-              handleMouseUp();
-              setHoveredDistrictName(null);
-            }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
           >
             <div
               style={{
-                transform: `scale(${zoomLevel}) translate(${pan.x / zoomLevel}px, ${pan.y / zoomLevel}px)`,
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoomLevel})`,
                 transformOrigin: 'center center',
-                transition: isDragging ? 'none' : 'transform 200ms ease-out',
+                transition: isDragging ? 'none' : 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+                willChange: 'transform',
               }}
               className="w-full h-full flex items-center justify-center transform-gpu relative"
             >
@@ -687,6 +839,7 @@ export function BangladeshInteractiveMap({
                       className="pointer-events-auto cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (hasDraggedRef.current) return;
                         handleSelectDistrict(canonicalName);
                       }}
                       onMouseEnter={() => setHoveredDistrictName(canonicalName)}
