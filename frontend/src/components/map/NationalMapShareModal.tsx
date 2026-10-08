@@ -85,7 +85,7 @@ export function NationalMapShareModal({
   const visitedCanonicalDistricts = useMemo(() => {
     const result: ValidDistrict[] = [];
     visitedSlugs.forEach((slug) => {
-      let canon = STATIC_SLUG_TO_CANONICAL.get(slug);
+      let canon: ValidDistrict | null | undefined = STATIC_SLUG_TO_CANONICAL.get(slug);
       if (!canon && districts) {
         const found = districts.find((d) => d.slug === slug);
         if (found) {
