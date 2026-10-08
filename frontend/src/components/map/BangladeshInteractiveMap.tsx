@@ -24,6 +24,7 @@ import {
   Move,
   CheckCheck,
 } from 'lucide-react';
+import { DISTRICT_MAP_COORDINATES } from './districtCoordinates';
 
 interface BangladeshInteractiveMapProps {
   districts: District[];
@@ -182,32 +183,32 @@ export function BangladeshInteractiveMap({
 
   /**
    * Handle Click / Tap on Map District:
-   * Tapping any district tabs/selects that whole division!
-   * Clicking a district within the already selected division unselects it.
+   * When user clicks a district on the map:
+   * 1. Toggle visit/pinned state so it gets permanently PINNED (or unpinned if clicked again)
+   * 2. Set as focused selected district
+   * 3. Set selectedDivisionSlug to that district's division so user can see its details in the sidebar
+   * DOES NOT unpin or unselect any other districts!
    */
   const handleSelectDistrict = (district: ValidDistrict) => {
     const d = canonicalToDistrict.get(district);
     if (!d) return;
 
-    const divSlug = d.division?.slug;
-    if (!divSlug) return;
+    // Toggle pin/visited state
+    toggleDistrictVisit(d.slug);
 
-    if (selectedDivisionSlug === divSlug) {
-      // If the division is already selected: unselect it!
-      setSelectedDivisionSlug(null);
-      setSelectedDistrictName(null);
-      useAppStore.getState().setSelectedDivisionSlug(null);
-    } else {
-      // Select this division and focus the clicked district
-      setSelectedDivisionSlug(divSlug);
-      setSelectedDistrictName(district);
-      useAppStore.getState().setSelectedDivisionSlug(divSlug);
+    // Focus this district
+    setSelectedDistrictName(district);
+
+    // Keep division context
+    if (d.division?.slug) {
+      setSelectedDivisionSlug(d.division.slug);
+      useAppStore.getState().setSelectedDivisionSlug(d.division.slug);
     }
   };
 
   /**
    * Handle Division Tab Click:
-   * Clicking the active division tab unselects it!
+   * Tabbing between divisions focuses that division WITHOUT unselecting any pinned districts!
    */
   const handleDivisionTabClick = (slug: string) => {
     if (selectedDivisionSlug === slug || slug === '') {
@@ -286,52 +287,49 @@ export function BangladeshInteractiveMap({
           opacity: 1 !important;
         }
 
-        /* Visited districts across ALL of Bangladesh: distinct rich emerald green */
+        /* Selected division unvisited districts: Highlighted with vibrant cyan */
+        ${
+          selectedDivisionSlug
+            ? selectedDivisionCanonicalNames
+                .filter((name) => !visitedCanonicalDistricts.includes(name))
+                .map(
+                  (name) => `
+            .manchitro-interactive-svg g[aria-label="${name}"] path {
+              fill: #0891b2 !important;
+              stroke: #38bdf8 !important;
+              stroke-width: 2.6px !important;
+              opacity: 1 !important;
+              filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8)) !important;
+            }
+          `
+                )
+                .join('\n')
+            : ''
+        }
+
+        /* Visited & Pinned districts across ALL divisions: ALWAYS distinct rich emerald green */
         ${visitedCanonicalDistricts
           .map(
             (name) => `
           .manchitro-interactive-svg g[aria-label="${name}"] path {
-            fill: #047857 !important;
-            stroke: #10b981 !important;
-            stroke-width: 1.6px !important;
+            fill: #059669 !important;
+            stroke: #34d399 !important;
+            stroke-width: 2.2px !important;
             opacity: 1 !important;
+            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.7)) !important;
           }
         `
           )
           .join('\n')}
 
-        /* Selected division districts: Highlighted with vibrant Cyan / Emerald glow while whole map stays visible! */
-        ${
-          selectedDivisionSlug
-            ? selectedDivisionCanonicalNames
-                .map((name) => {
-                  const isVisited = visitedCanonicalDistricts.includes(name);
-                  return `
-            .manchitro-interactive-svg g[aria-label="${name}"] path {
-              fill: ${isVisited ? '#059669' : '#0891b2'} !important;
-              stroke: ${isVisited ? '#34d399' : '#38bdf8'} !important;
-              stroke-width: 2.8px !important;
-              opacity: 1 !important;
-              filter: drop-shadow(0 0 14px ${
-                isVisited ? 'rgba(52, 211, 153, 0.9)' : 'rgba(56, 189, 248, 0.9)'
-              }) !important;
-            }
-          `;
-                })
-                .join('\n')
-            : ''
-        }
-
-        /* Pinned district (if any) */
+        /* Focused district (if any) */
         ${
           selectedDistrictName
             ? `
           .manchitro-interactive-svg g[aria-label="${selectedDistrictName}"] path {
-            fill: #f59e0b !important;
             stroke: #ffffff !important;
-            stroke-width: 3.2px !important;
-            opacity: 1 !important;
-            filter: drop-shadow(0 0 16px rgba(245, 158, 11, 1)) !important;
+            stroke-width: 3.5px !important;
+            filter: drop-shadow(0 0 18px rgba(245, 158, 11, 1)) !important;
           }
         `
             : ''
@@ -342,11 +340,9 @@ export function BangladeshInteractiveMap({
           hoveredDistrictName
             ? `
           .manchitro-interactive-svg g[aria-label="${hoveredDistrictName}"] path {
-            fill: #fbbf24 !important;
-            stroke: #ffffff !important;
+            stroke: #fef08a !important;
             stroke-width: 3.2px !important;
-            opacity: 1 !important;
-            filter: drop-shadow(0 0 18px rgba(251, 191, 36, 1)) !important;
+            filter: drop-shadow(0 0 16px rgba(251, 191, 36, 1)) !important;
           }
         `
             : ''
@@ -600,7 +596,7 @@ export function BangladeshInteractiveMap({
                 transformOrigin: 'center center',
                 transition: isDragging ? 'none' : 'transform 200ms ease-out',
               }}
-              className="w-full h-full flex items-center justify-center transform-gpu"
+              className="w-full h-full flex items-center justify-center transform-gpu relative"
             >
               <Manchitro
                 items={allCanonicalDistricts}
@@ -625,6 +621,80 @@ export function BangladeshInteractiveMap({
                 renderSelected={() => null}
                 renderDebug={() => null}
               />
+
+              {/* Map Pin Layer: Renders pins on all visited/pinned districts across Bangladesh */}
+              <svg
+                viewBox="0 0 1555 2140"
+                className="absolute inset-0 w-full h-full max-h-[500px] pointer-events-none transition-transform duration-300 drop-shadow-md"
+              >
+                <defs>
+                  <filter id="pin-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#000000" floodOpacity="0.75" />
+                  </filter>
+                </defs>
+                {visitedCanonicalDistricts.map((canonicalName) => {
+                  const coords = DISTRICT_MAP_COORDINATES[canonicalName];
+                  if (!coords) return null;
+                  const dObj = canonicalToDistrict.get(canonicalName);
+                  const isSelected = selectedDistrictName === canonicalName;
+
+                  return (
+                    <g
+                      key={`pin-${canonicalName}`}
+                      transform={`translate(${coords.x}, ${coords.y})`}
+                      className="pointer-events-auto cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectDistrict(canonicalName);
+                      }}
+                    >
+                      {/* Animated radar ripple */}
+                      <circle r="36" fill="#10b981" opacity="0.4" className="animate-ping" />
+
+                      {/* Ground Shadow */}
+                      <ellipse cx="0" cy="4" rx="16" ry="6" fill="rgba(0, 0, 0, 0.6)" />
+
+                      {/* Map Pin Marker */}
+                      <g transform="translate(-18, -48)">
+                        <path
+                          d="M18 0 C8.06 0 0 8.06 0 18 C0 31.5 18 48 18 48 C18 48 36 31.5 36 18 C36 8.06 27.94 0 18 0 Z"
+                          fill={isSelected ? '#f59e0b' : '#ef4444'}
+                          stroke="#ffffff"
+                          strokeWidth="3"
+                          filter="url(#pin-shadow)"
+                        />
+                        <circle cx="18" cy="18" r="7" fill="#ffffff" />
+                        <circle cx="18" cy="18" r="4" fill={isSelected ? '#d97706' : '#b91c1c'} />
+                      </g>
+
+                      {/* District Bangla Name Tag */}
+                      <g transform="translate(0, 14)">
+                        <rect
+                          x="-44"
+                          y="-13"
+                          width="88"
+                          height="22"
+                          rx="11"
+                          fill="rgba(15, 23, 42, 0.95)"
+                          stroke={isSelected ? '#f59e0b' : '#10b981'}
+                          strokeWidth="2"
+                        />
+                        <text
+                          x="0"
+                          y="2"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fill="#ffffff"
+                          fontSize="13"
+                          fontWeight="bold"
+                        >
+                          {dObj?.bnName || canonicalName}
+                        </text>
+                      </g>
+                    </g>
+                  );
+                })}
+              </svg>
             </div>
           </div>
         </div>
@@ -713,10 +783,15 @@ export function BangladeshInteractiveMap({
 
               {/* District Pills inside this division */}
               <div className="space-y-2 pt-2 border-t border-white/5">
-                <span className="text-[11px] font-bold text-slate-400 block">
-                  বিভাগের জেলাসমূহ (ট্যাপ করে পিন করুন):
-                </span>
-                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-300 block">
+                    {selectedDivisionInfo.bnName} বিভাগের জেলাসমূহ:
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-semibold">
+                    ট্যাপ করে পিন করুন 📍
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1">
                   {selectedDivisionInfo.districts.map((d) => {
                     const isVisited = mounted && isDistrictVisited(d.slug);
                     const canon = slugToCanonical.get(d.slug);
@@ -727,18 +802,24 @@ export function BangladeshInteractiveMap({
                         key={d.slug}
                         type="button"
                         onClick={() => {
+                          toggleDistrictVisit(d.slug);
                           if (canon) setSelectedDistrictName(canon);
                         }}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all outline-none focus:outline-none select-none border ${
-                          isFocused
-                            ? 'bg-amber-400 text-slate-950 font-black border-amber-200 shadow-md shadow-amber-500/20'
-                            : isVisited
-                            ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300 hover:bg-emerald-900/70 hover:border-emerald-400'
+                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all outline-none select-none border ${
+                          isVisited
+                            ? 'bg-emerald-600 text-white font-bold border-emerald-400 shadow-md shadow-emerald-950/40'
+                            : isFocused
+                            ? 'bg-amber-400 text-slate-950 font-black border-amber-200'
                             : 'bg-slate-800/80 border-slate-700/60 text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-500'
                         }`}
                       >
-                        {isVisited && <Check className="w-3 h-3 text-emerald-400" />}
+                        {isVisited ? (
+                          <MapPin className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                        ) : (
+                          <Pin className="w-3.5 h-3.5 text-slate-400" />
+                        )}
                         <span>{d.bnName || d.name}</span>
+                        {isVisited && <Check className="w-3 h-3 text-emerald-200 stroke-[3]" />}
                       </button>
                     );
                   })}
@@ -750,7 +831,7 @@ export function BangladeshInteractiveMap({
                 <div className="space-y-2 pt-3 border-t border-white/5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-300 font-bold flex items-center gap-1">
-                      <Pin className="w-3 h-3 text-amber-400 fill-amber-400" />
+                      <MapPin className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                       <span>{selectedDistrictObj.bnName || selectedDistrictObj.name}</span>
                     </span>
                     <span
@@ -760,7 +841,7 @@ export function BangladeshInteractiveMap({
                           : 'bg-slate-800 text-slate-400'
                       }`}
                     >
-                      {isSelectedDistrictVisited ? 'ঘুরেছি' : 'অদেখা'}
+                      {isSelectedDistrictVisited ? '📍 পিন করা' : '⭕ অপিনকৃত'}
                     </span>
                   </div>
 
@@ -776,12 +857,12 @@ export function BangladeshInteractiveMap({
                     {isSelectedDistrictVisited ? (
                       <>
                         <X className="w-3.5 h-3.5" />
-                        <span>চিহ্নিত বাদ দিন (Mark Unvisited)</span>
+                        <span>পিন বাদ দিন (Unpin)</span>
                       </>
                     ) : (
                       <>
-                        <Check className="w-3.5 h-3.5 stroke-[3]" />
-                        <span>জেলায় ঘুরেছি মার্ক করুন</span>
+                        <MapPin className="w-3.5 h-3.5 fill-current" />
+                        <span>ম্যাপে পিন করুন (Pin on Map)</span>
                       </>
                     )}
                   </button>
@@ -796,6 +877,49 @@ export function BangladeshInteractiveMap({
                 </div>
               )}
 
+              {/* All Pinned Districts Across Entire Bangladesh */}
+              <div className="space-y-2 pt-3 border-t border-white/5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
+                    <span>সকল পিন করা জেলা ({visitedCount}/৬৪)</span>
+                  </span>
+                </div>
+                {visitedCount > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pr-1">
+                    {visitedCanonicalDistricts.map((canon) => {
+                      const d = canonicalToDistrict.get(canon);
+                      if (!d) return null;
+                      const isFocused = selectedDistrictName === canon;
+                      return (
+                        <button
+                          key={`all-pinned-${canon}`}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDistrictName(canon);
+                            if (d.division?.slug) {
+                              setSelectedDivisionSlug(d.division.slug);
+                            }
+                          }}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all border ${
+                            isFocused
+                              ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md'
+                              : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900'
+                          }`}
+                        >
+                          <MapPin className="w-3 h-3 text-amber-400 fill-amber-400" />
+                          <span>{d.bnName || d.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-slate-400">
+                    ম্যাপে ক্লিক করে আপনার ভ্রমণ করা জেলাগুলো পিন করুন।
+                  </p>
+                )}
+              </div>
+
               {/* Explore Division Spots Link */}
               <Link
                 href={`/districts?division=${selectedDivisionInfo.slug}`}
@@ -806,13 +930,57 @@ export function BangladeshInteractiveMap({
               </Link>
             </div>
           ) : (
-            <div className="glass-card rounded-2xl p-5 border border-white/5 space-y-3 text-center">
-              <Compass className="w-8 h-8 text-emerald-400 mx-auto animate-pulse" />
-              <h4 className="text-sm font-bold text-white">যে কোনো বিভাগে ক্লিক করুন</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                মানচিত্রে আপনি যে বিভাগে ক্লিক করবেন, পুরো বিভাগ হাইলাইট হবে এবং এর সকল জেলা দেখা
-                যাবে। একই জায়গায় আবার ক্লিক করলে আনসিলেক্ট হয়ে যাবে।
-              </p>
+            <div className="glass-card rounded-2xl p-5 border border-white/5 space-y-4">
+              <div className="text-center space-y-2">
+                <Compass className="w-8 h-8 text-emerald-400 mx-auto animate-pulse" />
+                <h4 className="text-sm font-bold text-white">যে কোনো বিভাগে ক্লিক করুন</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  ম্যাপের যে কোনো জেলায় সরাসরি ক্লিক করলেই সেটি পিন হয়ে যাবে! অন্য বিভাগে গেলেও আপনার পিন করা জেলাগুলো পিন থাকবে।
+                </p>
+              </div>
+
+              {/* All Pinned Districts list when no division is selected */}
+              <div className="space-y-2 pt-3 border-t border-white/5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
+                    <span>সকল পিন করা জেলা ({visitedCount}/৬৪)</span>
+                  </span>
+                </div>
+                {visitedCount > 0 ? (
+                  <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                    {visitedCanonicalDistricts.map((canon) => {
+                      const d = canonicalToDistrict.get(canon);
+                      if (!d) return null;
+                      const isFocused = selectedDistrictName === canon;
+                      return (
+                        <button
+                          key={`all-pinned-default-${canon}`}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDistrictName(canon);
+                            if (d.division?.slug) {
+                              setSelectedDivisionSlug(d.division.slug);
+                            }
+                          }}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all border ${
+                            isFocused
+                              ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md'
+                              : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 hover:bg-emerald-900'
+                          }`}
+                        >
+                          <MapPin className="w-3 h-3 text-amber-400 fill-amber-400" />
+                          <span>{d.bnName || d.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-slate-400">
+                    ম্যাপের যেকোনো জেলায় ক্লিক করুন এবং নিজের ভ্রমণ পিন করুন।
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
