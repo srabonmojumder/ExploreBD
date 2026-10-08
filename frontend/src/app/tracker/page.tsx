@@ -9,6 +9,7 @@ import { useTravelStore } from '@/stores/useTravelStore';
 import { useMounted } from '@/hooks/useMounted';
 import { BangladeshInteractiveMap } from '@/components/map/BangladeshInteractiveMap';
 import { NationalMapShareModal } from '@/components/map/NationalMapShareModal';
+import { ALL_STATIC_DISTRICTS_LIST } from '@/components/map/districtMetadata';
 import {
   Compass,
   MapPin,
@@ -63,7 +64,7 @@ export default function TravelTrackerPage() {
     queryFn: () => ApiClient.getDistricts(),
   });
 
-  const districts = data?.data || [];
+  const districts = data?.data && data.data.length > 0 ? data.data : ALL_STATIC_DISTRICTS_LIST;
   const visitedDistrictSlugs = mounted ? getVisitedDistrictSlugs() : [];
   const totalVisitedPlaces = mounted ? getTotalVisitedCount() : 0;
   const totalVisitsCount = mounted ? getTotalVisitsCount() : 0;

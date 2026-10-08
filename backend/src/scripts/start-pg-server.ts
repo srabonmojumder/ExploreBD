@@ -22,7 +22,7 @@ export async function isPortInUse(port: number): Promise<boolean> {
   });
 }
 
-export async function startPgServer(port = 5432): Promise<EmbeddedPostgres | null> {
+export async function startPgServer(port = 5433): Promise<EmbeddedPostgres | null> {
   const inUse = await isPortInUse(port);
   if (inUse) {
     console.log(`[PG-Server] Port ${port} is already active. Using existing PostgreSQL instance.`);

@@ -25,6 +25,13 @@ import {
   CheckCheck,
 } from 'lucide-react';
 import { DISTRICT_MAP_COORDINATES } from './districtCoordinates';
+import {
+  ALL_STATIC_DISTRICTS,
+  ALL_STATIC_DIVISIONS,
+  STATIC_SLUG_TO_CANONICAL,
+  STATIC_CANONICAL_TO_DISTRICT,
+  STATIC_SLUG_TO_DISTRICT,
+} from './districtMetadata';
 
 interface BangladeshInteractiveMapProps {
   districts: District[];
@@ -69,8 +76,9 @@ export function BangladeshInteractiveMap({
 
   // Map district slugs to canonical manchitro names and vice-versa
   const { slugToCanonical, canonicalToDistrict, divisionDataMap } = useMemo(() => {
-    const slugMap = new Map<string, ValidDistrict>();
-    const canonMap = new Map<ValidDistrict, District>();
+    // 1. Initialize maps with all 64 static districts and 8 divisions guaranteed
+    const slugMap = new Map<string, ValidDistrict>(STATIC_SLUG_TO_CANONICAL);
+    const canonMap = new Map<ValidDistrict, District>(STATIC_CANONICAL_TO_DISTRICT);
     const divMap = new Map<
       string,
       {
@@ -83,35 +91,51 @@ export function BangladeshInteractiveMap({
       }
     >();
 
-    districts.forEach((d) => {
-      const canonical = resolveDistrict(d.name) || resolveDistrict(d.slug);
-      if (canonical) {
-        slugMap.set(d.slug, canonical);
-        canonMap.set(canonical, d);
-      }
-
-      const divSlug = d.division?.slug || 'other';
-      const divName = d.division?.name || 'Other';
-      const divBnName = d.division?.bnName || divName;
-
-      if (!divMap.has(divSlug)) {
-        divMap.set(divSlug, {
-          name: divName,
-          bnName: divBnName,
-          slug: divSlug,
-          districts: [],
-          canonicalNames: [],
-          spotsCount: 0,
-        });
-      }
-
-      const divItem = divMap.get(divSlug)!;
-      divItem.districts.push(d);
-      if (canonical && !divItem.canonicalNames.includes(canonical)) {
-        divItem.canonicalNames.push(canonical);
-      }
-      divItem.spotsCount += d._count?.places || 0;
+    ALL_STATIC_DIVISIONS.forEach((div) => {
+      divMap.set(div.slug, {
+        name: div.name,
+        bnName: div.bnName,
+        slug: div.slug,
+        districts: [],
+        canonicalNames: [],
+        spotsCount: 0,
+      });
     });
+
+    ALL_STATIC_DISTRICTS.forEach((d) => {
+      const divItem = divMap.get(d.division.slug);
+      const districtObj = STATIC_SLUG_TO_DISTRICT.get(d.slug);
+      if (divItem && districtObj) {
+        divItem.districts.push(districtObj);
+        divItem.canonicalNames.push(d.canonicalName);
+      }
+    });
+
+    // 2. If live API districts are supplied, enrich and augment with real places count
+    if (districts && districts.length > 0) {
+      districts.forEach((d) => {
+        const canonical = resolveDistrict(d.name) || resolveDistrict(d.slug);
+        if (canonical) {
+          slugMap.set(d.slug, canonical);
+          canonMap.set(canonical, d);
+        }
+
+        const divSlug = d.division?.slug || 'other';
+        const divItem = divMap.get(divSlug);
+        if (divItem) {
+          divItem.spotsCount += d._count?.places || 0;
+          const existingIdx = divItem.districts.findIndex((x) => x.slug === d.slug);
+          if (existingIdx >= 0) {
+            divItem.districts[existingIdx] = d;
+          } else {
+            divItem.districts.push(d);
+            if (canonical && !divItem.canonicalNames.includes(canonical)) {
+              divItem.canonicalNames.push(canonical);
+            }
+          }
+        }
+      });
+    }
 
     return {
       slugToCanonical: slugMap,
@@ -598,6 +622,40 @@ export function BangladeshInteractiveMap({
               }}
               className="w-full h-full flex items-center justify-center transform-gpu relative"
             >
+              {/* Dynamic CSS styles: visited districts turn rich emerald (#059669), selected turns gold (#f59e0b) */}
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    .manchitro-interactive-svg g {
+                      transition: all 180ms ease;
+                    }
+                    .manchitro-interactive-svg g:hover path {
+                      fill: #334155 !important;
+                    }
+                    ${visitedCanonicalDistricts
+                      .map(
+                        (canon) => `
+                      .manchitro-interactive-svg g[aria-label="${canon}"] path {
+                        fill: #059669 !important;
+                        stroke: #34d399 !important;
+                        stroke-width: 1.5px !important;
+                        opacity: 1 !important;
+                      }
+                      .manchitro-interactive-svg g[aria-label="${canon}"]:hover path {
+                        fill: #10b981 !important;
+                      }
+                      .manchitro-interactive-svg g[aria-label="${canon}"][aria-pressed="true"] path {
+                        fill: #d97706 !important;
+                        stroke: #ffffff !important;
+                        stroke-width: 3px !important;
+                      }
+                    `
+                      )
+                      .join('\n')}
+                  `,
+                }}
+              />
+
               <Manchitro
                 items={allCanonicalDistricts}
                 value={selectedDistrictName}
@@ -612,7 +670,7 @@ export function BangladeshInteractiveMap({
                 svgClassName="manchitro-interactive-svg w-full h-auto max-h-[500px] transition-transform duration-300 drop-shadow-md"
                 colors={{
                   base: '#1e293b',
-                  active: '#10b981',
+                  active: '#1e293b',
                   selected: '#f59e0b',
                   stroke: 'rgba(255, 255, 255, 0.25)',
                   selectedStroke: '#ffffff',

@@ -5,10 +5,10 @@ import prisma from './repositories/prisma.js';
 
 async function bootstrap() {
   try {
-    // If in development mode and Postgres port 5432 is not currently active, auto-start embedded PG server
+    // If in development mode and Postgres port 5433 is not currently active, auto-start embedded PG server
     if (config.isDev) {
       try {
-        await startPgServer(5432);
+        await startPgServer(5433);
       } catch (err) {
         console.warn('[Bootstrap] Note on DB server:', err);
       }
