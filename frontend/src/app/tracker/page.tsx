@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
@@ -39,14 +39,14 @@ const DIVISIONS = [
 
 export default function TravelTrackerPage() {
   const mounted = useMounted();
-  const {
-    travelerName,
-    setTravelerName,
-    getDistrictStats,
-    getVisitedDistrictSlugs,
-    getTotalVisitedCount,
-    getTotalVisitsCount,
-  } = useTravelStore();
+  const travelerName = useTravelStore((s) => s.travelerName);
+  const setTravelerName = useTravelStore((s) => s.setTravelerName);
+  const manualVisitedDistricts = useTravelStore((s) => s.manualVisitedDistricts);
+  const visits = useTravelStore((s) => s.visits);
+  const getDistrictStats = useTravelStore((s) => s.getDistrictStats);
+  const getVisitedDistrictSlugs = useTravelStore((s) => s.getVisitedDistrictSlugs);
+  const getTotalVisitedCount = useTravelStore((s) => s.getTotalVisitedCount);
+  const getTotalVisitsCount = useTravelStore((s) => s.getTotalVisitsCount);
 
   const [selectedDivision, setSelectedDivision] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +65,20 @@ export default function TravelTrackerPage() {
   });
 
   const districts = data?.data && data.data.length > 0 ? data.data : ALL_STATIC_DISTRICTS_LIST;
-  const visitedDistrictSlugs = mounted ? getVisitedDistrictSlugs() : [];
+
+  // Real-time visited district slugs derived from store slices
+  const visitedDistrictSlugs = useMemo(() => {
+    if (!mounted) return [];
+    const set = new Set<string>();
+    Object.entries(manualVisitedDistricts || {}).forEach(([slug, val]) => {
+      if (val) set.add(slug);
+    });
+    Object.values(visits || {}).forEach((item) => {
+      if (item && item.count > 0 && item.districtSlug) set.add(item.districtSlug);
+    });
+    return Array.from(set);
+  }, [mounted, manualVisitedDistricts, visits]);
+
   const totalVisitedPlaces = mounted ? getTotalVisitedCount() : 0;
   const totalVisitsCount = mounted ? getTotalVisitsCount() : 0;
   const visitedDistrictCount = visitedDistrictSlugs.length;

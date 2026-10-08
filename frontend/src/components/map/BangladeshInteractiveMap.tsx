@@ -55,11 +55,11 @@ export function BangladeshInteractiveMap({
   onOpenShareModal,
 }: BangladeshInteractiveMapProps) {
   const mounted = useMounted();
-  const {
-    getVisitedDistrictSlugs,
-    toggleDistrictVisit,
-    isDistrictVisited,
-  } = useTravelStore();
+  // Subscribe to real-time state slices so clicks re-render instantly (0 latency)
+  const manualVisitedDistricts = useTravelStore((s) => s.manualVisitedDistricts);
+  const visits = useTravelStore((s) => s.visits);
+  const toggleDistrictVisit = useTravelStore((s) => s.toggleDistrictVisit);
+  const isDistrictVisited = useTravelStore((s) => s.isDistrictVisited);
 
   // Division & District Selection State
   const [selectedDivisionSlug, setSelectedDivisionSlug] = useState<string | null>(null);
@@ -149,12 +149,21 @@ export function BangladeshInteractiveMap({
     return [...DISTRICTS] as ValidDistrict[];
   }, []);
 
-  // Compute visited canonical district names
+  // Compute visited canonical district names in real time whenever visits change
   const visitedCanonicalDistricts = useMemo(() => {
     if (!mounted) return [];
-    const visitedSlugs = getVisitedDistrictSlugs();
-    const result: ValidDistrict[] = [];
+    
+    const visitedSlugs = new Set<string>();
+    Object.entries(manualVisitedDistricts || {}).forEach(([slug, val]) => {
+      if (val) visitedSlugs.add(slug);
+    });
+    Object.values(visits || {}).forEach((item) => {
+      if (item && item.count > 0 && item.districtSlug) {
+        visitedSlugs.add(item.districtSlug);
+      }
+    });
 
+    const result: ValidDistrict[] = [];
     visitedSlugs.forEach((slug) => {
       const canon = slugToCanonical.get(slug);
       if (canon && !result.includes(canon)) {
@@ -163,7 +172,7 @@ export function BangladeshInteractiveMap({
     });
 
     return result;
-  }, [mounted, getVisitedDistrictSlugs, slugToCanonical]);
+  }, [mounted, manualVisitedDistricts, visits, slugToCanonical]);
 
   // Canonical districts belonging to the currently selected division
   const selectedDivisionCanonicalNames = useMemo(() => {
@@ -193,13 +202,13 @@ export function BangladeshInteractiveMap({
   const visitedCount = visitedCanonicalDistricts.length;
   const percentage = Math.round((visitedCount / 64) * 100);
 
-  // Visited count within selected division
+  // Visited count within selected division (updates in real time)
   const divisionVisitedCount = useMemo(() => {
     if (!selectedDivisionInfo) return 0;
     return selectedDivisionInfo.districts.filter((d) =>
       mounted && isDistrictVisited(d.slug)
     ).length;
-  }, [selectedDivisionInfo, mounted, isDistrictVisited]);
+  }, [selectedDivisionInfo, mounted, isDistrictVisited, manualVisitedDistricts, visits]);
 
   const isSelectedDistrictVisited = Boolean(
     selectedDistrictObj && mounted && isDistrictVisited(selectedDistrictObj.slug)
@@ -666,8 +675,10 @@ export function BangladeshInteractiveMap({
                 onDistrictMouseLeave={() => {
                   setHoveredDistrictName(null);
                 }}
-                className="w-full h-full flex items-center justify-center relative"
-                svgClassName="manchitro-interactive-svg w-full h-auto max-h-[500px] transition-transform duration-300 drop-shadow-md"
+                className="w-full h-full relative"
+                style={{ width: '100%', height: '100%' }}
+                svgClassName="manchitro-interactive-svg w-full h-full block transition-transform duration-300 drop-shadow-md"
+                svgStyle={{ width: '100%', height: '100%', display: 'block' }}
                 colors={{
                   base: '#1e293b',
                   active: '#1e293b',
@@ -680,14 +691,16 @@ export function BangladeshInteractiveMap({
                 renderDebug={() => null}
               />
 
-              {/* Map Pin Layer: Renders pins on all visited/pinned districts across Bangladesh */}
+              {/* Map Pin Layer: Perfectly aligned 1:1 overlay with Manchitro viewBox */}
               <svg
                 viewBox="0 0 1555 2140"
-                className="absolute inset-0 w-full h-full max-h-[500px] pointer-events-none transition-transform duration-300 drop-shadow-md"
+                preserveAspectRatio="xMidYMid meet"
+                className="absolute inset-0 w-full h-full pointer-events-none transition-transform duration-300 drop-shadow-md"
+                style={{ width: '100%', height: '100%', display: 'block' }}
               >
                 <defs>
                   <filter id="pin-shadow" x="-30%" y="-30%" width="160%" height="160%">
-                    <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#000000" floodOpacity="0.75" />
+                    <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#000000" floodOpacity="0.75" />
                   </filter>
                 </defs>
                 {visitedCanonicalDistricts.map((canonicalName) => {
@@ -706,49 +719,54 @@ export function BangladeshInteractiveMap({
                         handleSelectDistrict(canonicalName);
                       }}
                     >
-                      {/* Animated radar ripple */}
-                      <circle r="36" fill="#10b981" opacity="0.4" className="animate-ping" />
-
                       {/* Ground Shadow */}
-                      <ellipse cx="0" cy="4" rx="16" ry="6" fill="rgba(0, 0, 0, 0.6)" />
+                      <ellipse cx="0" cy="0" rx="16" ry="6" fill="rgba(0, 0, 0, 0.5)" />
 
-                      {/* Map Pin Marker */}
-                      <g transform="translate(-18, -48)">
+                      {/* Active beacon ripple for selected district */}
+                      {isSelected && (
+                        <circle r="36" fill="#f59e0b" opacity="0.45" className="animate-ping" />
+                      )}
+
+                      {/* Crisp, professional Teardrop Map Pin Marker */}
+                      <g transform="translate(-25, -72)">
                         <path
-                          d="M18 0 C8.06 0 0 8.06 0 18 C0 31.5 18 48 18 48 C18 48 36 31.5 36 18 C36 8.06 27.94 0 18 0 Z"
+                          d="M25 0 C11.19 0 0 11.19 0 25 C0 44 25 72 25 72 C25 72 50 44 50 25 C50 11.19 38.81 0 25 0 Z"
                           fill={isSelected ? '#f59e0b' : '#ef4444'}
                           stroke="#ffffff"
-                          strokeWidth="3"
+                          strokeWidth="4"
                           filter="url(#pin-shadow)"
                         />
-                        <circle cx="18" cy="18" r="7" fill="#ffffff" />
-                        <circle cx="18" cy="18" r="4" fill={isSelected ? '#d97706' : '#b91c1c'} />
+                        <circle cx="25" cy="25" r="11" fill="#ffffff" />
+                        <circle cx="25" cy="25" r="6" fill={isSelected ? '#d97706' : '#b91c1c'} />
                       </g>
 
-                      {/* District Bangla Name Tag */}
-                      <g transform="translate(0, 14)">
-                        <rect
-                          x="-44"
-                          y="-13"
-                          width="88"
-                          height="22"
-                          rx="11"
-                          fill="rgba(15, 23, 42, 0.95)"
-                          stroke={isSelected ? '#f59e0b' : '#10b981'}
-                          strokeWidth="2"
-                        />
-                        <text
-                          x="0"
-                          y="2"
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fill="#ffffff"
-                          fontSize="13"
-                          fontWeight="bold"
-                        >
-                          {dObj?.bnName || canonicalName}
-                        </text>
-                      </g>
+                      {/* District Bangla Name Tag - shown on focus or hover */}
+                      {(isSelected || hoveredDistrictName === canonicalName) && (
+                        <g transform="translate(0, 16)">
+                          <rect
+                            x="-55"
+                            y="-14"
+                            width="110"
+                            height="28"
+                            rx="14"
+                            fill="rgba(15, 23, 42, 0.96)"
+                            stroke={isSelected ? '#f59e0b' : '#10b981'}
+                            strokeWidth="2.5"
+                          />
+                          <text
+                            x="0"
+                            y="4"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fill="#ffffff"
+                            fontSize="15"
+                            fontWeight="bold"
+                            className="select-none pointer-events-none"
+                          >
+                            {dObj?.bnName || canonicalName}
+                          </text>
+                        </g>
+                      )}
                     </g>
                   );
                 })}
