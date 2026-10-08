@@ -84,6 +84,43 @@ export default function TravelTrackerPage() {
   const visitedDistrictCount = visitedDistrictSlugs.length;
   const nationalPercentage = Math.round((visitedDistrictCount / 64) * 100);
 
+  // Precompute district stats in a single fast pass for 60fps rendering
+  const districtStatsMap = useMemo(() => {
+    const visitsByDistrict: Record<string, number> = {};
+    const totalCountByDistrict: Record<string, number> = {};
+
+    Object.values(visits || {}).forEach((item) => {
+      if (item && item.districtSlug) {
+        visitsByDistrict[item.districtSlug] = (visitsByDistrict[item.districtSlug] || 0) + 1;
+        totalCountByDistrict[item.districtSlug] =
+          (totalCountByDistrict[item.districtSlug] || 0) + (item.count || 0);
+      }
+    });
+
+    const map = new Map<
+      string,
+      { visitedPlaces: number; totalVisits: number; percentage: number; isVisited: boolean }
+    >();
+
+    districts.forEach((d) => {
+      const visitedPlaces = visitsByDistrict[d.slug] || 0;
+      const totalVisits = totalCountByDistrict[d.slug] || 0;
+      const totalPlaces = d._count?.places || 0;
+      const percentage =
+        totalPlaces > 0 ? Math.min(100, Math.round((visitedPlaces / totalPlaces) * 100)) : 0;
+      const isManual = Boolean(manualVisitedDistricts && manualVisitedDistricts[d.slug]);
+
+      map.set(d.slug, {
+        visitedPlaces,
+        totalVisits,
+        percentage,
+        isVisited: isManual || visitedPlaces > 0,
+      });
+    });
+
+    return map;
+  }, [districts, visits, manualVisitedDistricts]);
+
   // Filter districts
   const filteredDistricts = districts.filter((d) => {
     if (selectedDivision && d.division?.slug !== selectedDivision) return false;
@@ -266,15 +303,19 @@ export default function TravelTrackerPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {filteredDistricts.map((district) => {
             const totalPlaces = district._count?.places ?? 0;
-            const stats = getDistrictStats(district.slug, totalPlaces);
-            const isVisited = stats.visitedPlaces > 0;
+            const stats = districtStatsMap.get(district.slug) || {
+              visitedPlaces: 0,
+              totalVisits: 0,
+              percentage: 0,
+              isVisited: false,
+            };
 
             return (
               <TrackerDistrictCard
                 key={district.id}
                 district={district}
                 stats={stats}
-                isVisited={isVisited}
+                isVisited={stats.isVisited}
                 totalPlaces={totalPlaces}
               />
             );
@@ -292,7 +333,7 @@ export default function TravelTrackerPage() {
   );
 }
 
-function TrackerDistrictCard({
+const TrackerDistrictCard = React.memo(function TrackerDistrictCard({
   district,
   stats,
   isVisited,
@@ -400,5 +441,5 @@ function TrackerDistrictCard({
       </div>
     </Link>
   );
-}
+});
 

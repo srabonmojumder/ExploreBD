@@ -306,81 +306,79 @@ export function BangladeshInteractiveMap({
 
   const handleTouchEnd = () => setIsDragging(false);
 
-  return (
-    <div className="relative flex flex-col lg:flex-row gap-6 items-stretch rounded-3xl glass-card border border-white/10 p-4 sm:p-7 overflow-hidden shadow-2xl">
-      {/* Dynamic Scoped CSS for Manchitro SVG styling */}
-      <style>{`
-        /* Base styling: ALL 64 districts of Bangladesh are clearly visible and defined */
-        .manchitro-interactive-svg g path {
-          transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-          cursor: pointer !important;
-          fill: #1e293b !important;
-          stroke: rgba(255, 255, 255, 0.28) !important;
-          stroke-width: 1.2px !important;
+  // Memoized, lightning-fast SVG stylesheet (0 re-parsing overhead on mouse moves)
+  const dynamicMapStyles = useMemo(() => {
+    const visitedRules = visitedCanonicalDistricts
+      .map(
+        (name) => `
+        .manchitro-interactive-svg g[aria-label="${name}"] path {
+          fill: #059669 !important;
+          stroke: #34d399 !important;
+          stroke-width: 1.8px !important;
           opacity: 1 !important;
         }
-
-        /* Selected division unvisited districts: Highlighted with vibrant cyan */
-        ${
-          selectedDivisionSlug
-            ? selectedDivisionCanonicalNames
-                .filter((name) => !visitedCanonicalDistricts.includes(name))
-                .map(
-                  (name) => `
-            .manchitro-interactive-svg g[aria-label="${name}"] path {
-              fill: #0891b2 !important;
-              stroke: #38bdf8 !important;
-              stroke-width: 2.6px !important;
-              opacity: 1 !important;
-              filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8)) !important;
-            }
-          `
-                )
-                .join('\n')
-            : ''
+        .manchitro-interactive-svg g[aria-label="${name}"]:hover path {
+          fill: #10b981 !important;
+          stroke: #6ee7b7 !important;
         }
+      `
+      )
+      .join('\n');
 
-        /* Visited & Pinned districts across ALL divisions: ALWAYS distinct rich emerald green */
-        ${visitedCanonicalDistricts
+    const selectedDivisionRules = selectedDivisionSlug
+      ? selectedDivisionCanonicalNames
+          .filter((name) => !visitedCanonicalDistricts.includes(name))
           .map(
             (name) => `
           .manchitro-interactive-svg g[aria-label="${name}"] path {
-            fill: #059669 !important;
-            stroke: #34d399 !important;
+            fill: #0891b2 !important;
+            stroke: #38bdf8 !important;
             stroke-width: 2.2px !important;
             opacity: 1 !important;
-            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.7)) !important;
+          }
+          .manchitro-interactive-svg g[aria-label="${name}"]:hover path {
+            fill: #06b6d4 !important;
+            stroke: #bae6fd !important;
           }
         `
           )
-          .join('\n')}
+          .join('\n')
+      : '';
 
-        /* Focused district (if any) */
-        ${
-          selectedDistrictName
-            ? `
-          .manchitro-interactive-svg g[aria-label="${selectedDistrictName}"] path {
-            stroke: #ffffff !important;
-            stroke-width: 3.5px !important;
-            filter: drop-shadow(0 0 18px rgba(245, 158, 11, 1)) !important;
-          }
-        `
-            : ''
+    const focusedDistrictRule = selectedDistrictName
+      ? `
+        .manchitro-interactive-svg g[aria-label="${selectedDistrictName}"] path {
+          stroke: #f59e0b !important;
+          stroke-width: 3.2px !important;
+          fill-opacity: 0.95 !important;
         }
+      `
+      : '';
 
-        /* Hovered district highlight */
-        ${
-          hoveredDistrictName
-            ? `
-          .manchitro-interactive-svg g[aria-label="${hoveredDistrictName}"] path {
-            stroke: #fef08a !important;
-            stroke-width: 3.2px !important;
-            filter: drop-shadow(0 0 16px rgba(251, 191, 36, 1)) !important;
-          }
-        `
-            : ''
-        }
-      `}</style>
+    return `
+      .manchitro-interactive-svg g path {
+        transition: fill 120ms ease, stroke 120ms ease !important;
+        cursor: pointer !important;
+        fill: #1e293b !important;
+        stroke: rgba(255, 255, 255, 0.25) !important;
+        stroke-width: 1.2px !important;
+        opacity: 1 !important;
+      }
+      .manchitro-interactive-svg g:hover path {
+        fill: #334155 !important;
+        stroke: #fef08a !important;
+        stroke-width: 2.2px !important;
+      }
+      ${visitedRules}
+      ${selectedDivisionRules}
+      ${focusedDistrictRule}
+    `;
+  }, [visitedCanonicalDistricts, selectedDivisionSlug, selectedDivisionCanonicalNames, selectedDistrictName]);
+
+  return (
+    <div className="relative flex flex-col lg:flex-row gap-6 items-stretch rounded-3xl glass-card border border-white/10 p-4 sm:p-7 overflow-hidden shadow-2xl">
+      {/* Optimized Dynamic Scoped CSS for Manchitro SVG styling */}
+      <style dangerouslySetInnerHTML={{ __html: dynamicMapStyles }} />
 
       {/* Ambient background lighting */}
       <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -631,40 +629,6 @@ export function BangladeshInteractiveMap({
               }}
               className="w-full h-full flex items-center justify-center transform-gpu relative"
             >
-              {/* Dynamic CSS styles: visited districts turn rich emerald (#059669), selected turns gold (#f59e0b) */}
-              <style
-                dangerouslySetInnerHTML={{
-                  __html: `
-                    .manchitro-interactive-svg g {
-                      transition: all 180ms ease;
-                    }
-                    .manchitro-interactive-svg g:hover path {
-                      fill: #334155 !important;
-                    }
-                    ${visitedCanonicalDistricts
-                      .map(
-                        (canon) => `
-                      .manchitro-interactive-svg g[aria-label="${canon}"] path {
-                        fill: #059669 !important;
-                        stroke: #34d399 !important;
-                        stroke-width: 1.5px !important;
-                        opacity: 1 !important;
-                      }
-                      .manchitro-interactive-svg g[aria-label="${canon}"]:hover path {
-                        fill: #10b981 !important;
-                      }
-                      .manchitro-interactive-svg g[aria-label="${canon}"][aria-pressed="true"] path {
-                        fill: #d97706 !important;
-                        stroke: #ffffff !important;
-                        stroke-width: 3px !important;
-                      }
-                    `
-                      )
-                      .join('\n')}
-                  `,
-                }}
-              />
-
               <Manchitro
                 items={allCanonicalDistricts}
                 value={selectedDistrictName}
@@ -702,12 +666,19 @@ export function BangladeshInteractiveMap({
                   <filter id="pin-shadow" x="-30%" y="-30%" width="160%" height="160%">
                     <feDropShadow dx="0" dy="6" stdDeviation="5" floodColor="#000000" floodOpacity="0.75" />
                   </filter>
+                  <filter id="tooltip-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#000000" floodOpacity="0.85" />
+                  </filter>
                 </defs>
                 {visitedCanonicalDistricts.map((canonicalName) => {
                   const coords = DISTRICT_MAP_COORDINATES[canonicalName];
                   if (!coords) return null;
                   const dObj = canonicalToDistrict.get(canonicalName);
                   const isSelected = selectedDistrictName === canonicalName;
+                  const isHovered = hoveredDistrictName === canonicalName;
+                  const districtBnName = dObj?.bnName || canonicalName;
+                  const districtEnName = dObj?.name || canonicalName;
+                  const divisionBnName = dObj?.division?.bnName ? `${dObj.division.bnName} বিভাগ` : 'বাংলাদেশ';
 
                   return (
                     <g
@@ -718,52 +689,89 @@ export function BangladeshInteractiveMap({
                         e.stopPropagation();
                         handleSelectDistrict(canonicalName);
                       }}
+                      onMouseEnter={() => setHoveredDistrictName(canonicalName)}
+                      onMouseLeave={() => setHoveredDistrictName(null)}
                     >
                       {/* Ground Shadow */}
-                      <ellipse cx="0" cy="0" rx="16" ry="6" fill="rgba(0, 0, 0, 0.5)" />
+                      <ellipse cx="0" cy="0" rx="16" ry="6" fill="rgba(0, 0, 0, 0.55)" />
 
                       {/* Active beacon ripple for selected district */}
                       {isSelected && (
                         <circle r="36" fill="#f59e0b" opacity="0.45" className="animate-ping" />
                       )}
 
-                      {/* Crisp, professional Teardrop Map Pin Marker */}
-                      <g transform="translate(-25, -72)">
+                      {/* Crisp, professional Teardrop Map Pin Marker with smooth hover elevation */}
+                      <g
+                        transform={isHovered || isSelected ? 'translate(-28, -80) scale(1.14)' : 'translate(-25, -72)'}
+                        style={{ transition: 'transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+                      >
                         <path
                           d="M25 0 C11.19 0 0 11.19 0 25 C0 44 25 72 25 72 C25 72 50 44 50 25 C50 11.19 38.81 0 25 0 Z"
                           fill={isSelected ? '#f59e0b' : '#ef4444'}
                           stroke="#ffffff"
-                          strokeWidth="4"
+                          strokeWidth={isHovered ? '4.5' : '3.8'}
                           filter="url(#pin-shadow)"
                         />
                         <circle cx="25" cy="25" r="11" fill="#ffffff" />
                         <circle cx="25" cy="25" r="6" fill={isSelected ? '#d97706' : '#b91c1c'} />
                       </g>
 
-                      {/* District Bangla Name Tag - shown on focus or hover */}
-                      {(isSelected || hoveredDistrictName === canonicalName) && (
-                        <g transform="translate(0, 16)">
+                      {/* User-friendly District & Division Hover Tooltip Card */}
+                      {(isHovered || isSelected) && (
+                        <g transform="translate(0, -96)" className="pointer-events-none select-none">
+                          {/* Tooltip Card Box */}
                           <rect
-                            x="-55"
-                            y="-14"
-                            width="110"
-                            height="28"
+                            x="-115"
+                            y="-52"
+                            width="230"
+                            height="60"
                             rx="14"
-                            fill="rgba(15, 23, 42, 0.96)"
+                            fill="rgba(15, 23, 42, 0.98)"
+                            stroke={isSelected ? '#f59e0b' : '#10b981'}
+                            strokeWidth="2.5"
+                            filter="url(#tooltip-shadow)"
+                          />
+                          {/* Triangle Pointer down to pin */}
+                          <path
+                            d="M -10 8 L 0 18 L 10 8 Z"
+                            fill="rgba(15, 23, 42, 0.98)"
                             stroke={isSelected ? '#f59e0b' : '#10b981'}
                             strokeWidth="2.5"
                           />
+                          {/* Seamless connector seam */}
+                          <rect
+                            x="-12"
+                            y="5"
+                            width="24"
+                            height="4"
+                            fill="rgba(15, 23, 42, 0.98)"
+                          />
+
+                          {/* Line 1: District Bangla & English Name */}
                           <text
                             x="0"
-                            y="4"
+                            y="-27"
                             textAnchor="middle"
                             dominantBaseline="middle"
                             fill="#ffffff"
-                            fontSize="15"
+                            fontSize="17"
                             fontWeight="bold"
-                            className="select-none pointer-events-none"
                           >
-                            {dObj?.bnName || canonicalName}
+                            {districtBnName}
+                            <tspan fill="#94a3b8" fontSize="13" fontWeight="normal"> ({districtEnName})</tspan>
+                          </text>
+
+                          {/* Line 2: Division Name & Pinned Status */}
+                          <text
+                            x="0"
+                            y="-6"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fill="#34d399"
+                            fontSize="13"
+                            fontWeight="600"
+                          >
+                            🏛️ {divisionBnName} • ✓ পিন করা
                           </text>
                         </g>
                       )}
