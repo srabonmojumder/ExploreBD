@@ -32,6 +32,7 @@ import {
   STATIC_CANONICAL_TO_DISTRICT,
   STATIC_SLUG_TO_DISTRICT,
 } from './districtMetadata';
+import { getDistrictUpazilas } from './upazilaMetadata';
 
 interface BangladeshInteractiveMapProps {
   districts: District[];
@@ -608,6 +609,14 @@ export function BangladeshInteractiveMap({
               </div>
 
               <div className="flex items-center gap-2 ml-auto">
+                {(() => {
+                  const upazilas = getDistrictUpazilas(hoveredDistrictObj.slug);
+                  return (
+                    <span className="text-[11px] px-2.5 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-bold hidden sm:inline-flex items-center gap-1">
+                      🏛️ {upazilas.length}টি থানা/উপজেলা
+                    </span>
+                  );
+                })()}
                 <span className="text-[11px] px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-amber-400" />
                   {hoveredDistrictObj._count?.places || 0}টি স্পট
@@ -1081,6 +1090,22 @@ export function BangladeshInteractiveMap({
                       {isSelectedDistrictVisited ? '📍 পিন করা' : '⭕ অপিনকৃত'}
                     </span>
                   </div>
+
+                  {(() => {
+                    const upazilas = getDistrictUpazilas(selectedDistrictObj.slug);
+                    if (upazilas.length === 0) return null;
+                    return (
+                      <div className="text-[11px] bg-slate-900/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+                        <div className="flex items-center justify-between text-cyan-300 font-semibold text-[11px]">
+                          <span>🏛️ {upazilas.length}টি উপজেলা ও থানা</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">
+                          {upazilas.slice(0, 6).map((u) => u.bnName).join(' • ')}
+                          {upazilas.length > 6 ? ` সহ আরও ${upazilas.length - 6}টি` : ''}
+                        </p>
+                      </div>
+                    );
+                  })()}
 
                   <button
                     type="button"

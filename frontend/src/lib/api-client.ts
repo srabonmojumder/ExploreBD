@@ -85,6 +85,8 @@ export interface Place {
   totalVisitors: number;
   latitude: number;
   longitude: number;
+  thana?: string | null;
+  upazila?: string | null;
   district: {
     name: string;
     bnName: string | null;
@@ -114,6 +116,7 @@ export interface DistrictDetail extends District {
     description: string | null;
   };
   places: Place[];
+  upazilas?: Array<{ name: string; bnName: string; slug: string }>;
   stats: {
     totalPlaces: number;
     exploredPlaces: number;

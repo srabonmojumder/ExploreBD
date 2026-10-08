@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Place } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
 import { useMounted } from '@/hooks/useMounted';
 import { DistrictSpotTrackerCard } from './DistrictSpotTrackerCard';
 import { DistrictShareCardModal } from './DistrictShareCardModal';
+import { getDistrictUpazilas, resolvePlaceUpazila } from '@/components/map/upazilaMetadata';
+import { getStaticPlacesForDistrict } from '@/data/bangladeshPlacesData';
 import {
   Compass,
   Trophy,
@@ -15,6 +17,9 @@ import {
   Circle,
   Filter,
   RotateCcw,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 interface DistrictSpotTrackerProps {
@@ -35,40 +40,91 @@ export function DistrictSpotTracker({
 
   const [activeTab, setActiveTab] = useState<'ALL' | 'VISITED' | 'UNVISITED'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [selectedUpazila, setSelectedUpazila] = useState<string>('ALL');
+  const [showAllUpazilas, setShowAllUpazilas] = useState<boolean>(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
+  // 1. Get official Upazilas/Thanas for this district
+  const districtUpazilas = useMemo(() => {
+    return getDistrictUpazilas(districtSlug);
+  }, [districtSlug]);
+
+  // 2. Seamlessly merge incoming DB places with curated static places to guarantee full coverage
+  const allPlaces = useMemo(() => {
+    const list = [...places];
+    const existingSlugs = new Set(places.map((p) => p.slug));
+    const staticSpots = getStaticPlacesForDistrict(districtSlug);
+
+    for (const spot of staticSpots) {
+      if (!existingSlugs.has(spot.slug)) {
+        list.push({
+          id: `static-${spot.slug}`,
+          name: spot.name,
+          bnName: spot.bnName,
+          slug: spot.slug,
+          description: spot.description,
+          coverImage: spot.coverImage,
+          category: spot.category,
+          averageRating: spot.averageRating,
+          totalVisitors: spot.totalVisitors,
+          latitude: spot.latitude,
+          longitude: spot.longitude,
+          thana: spot.upazilaBn,
+          upazila: spot.upazilaBn,
+          district: { name: districtName, bnName: districtBnName || null, slug: districtSlug },
+          division: { name: '', bnName: null, slug: '' },
+          images: [{ url: spot.coverImage, caption: spot.bnName }],
+          _count: { visits: 0, reviews: 0 },
+        });
+      }
+    }
+    return list;
+  }, [places, districtSlug, districtName, districtBnName]);
+
   const defaultStats = {
-    totalPlaces: places.length,
+    totalPlaces: allPlaces.length,
     visitedPlaces: 0,
     totalVisits: 0,
     percentage: 0,
     levelTitle: 'ভ্রমণ শুরুর অপেক্ষায়',
     levelBadge: '🌱',
   };
-  const stats = mounted ? getDistrictStats(districtSlug, places.length) : defaultStats;
+  const stats = mounted ? getDistrictStats(districtSlug, allPlaces.length) : defaultStats;
   const displayName = districtBnName || districtName;
 
-  // Filter places based on activeTab and category
-  const filteredPlaces = places.filter((place) => {
-    if (!mounted) {
-      if (activeTab === 'VISITED') return false;
+  // 3. Filter places based on activeTab, category, and selectedUpazila
+  const filteredPlaces = useMemo(() => {
+    return allPlaces.filter((place) => {
+      if (!mounted) {
+        if (activeTab === 'VISITED') return false;
+        if (selectedCategory !== 'ALL' && place.category !== selectedCategory) return false;
+        return true;
+      }
+      const visit = getPlaceVisit(place.slug);
+      const isVisited = Boolean(visit && visit.count > 0);
+
+      // Filter by visit status
+      if (activeTab === 'VISITED' && !isVisited) return false;
+      if (activeTab === 'UNVISITED' && isVisited) return false;
+
+      // Filter by category
       if (selectedCategory !== 'ALL' && place.category !== selectedCategory) return false;
+
+      // Filter by Upazila/Thana
+      if (selectedUpazila !== 'ALL') {
+        const placeUpazila = resolvePlaceUpazila(place, districtSlug);
+        const matches =
+          placeUpazila === selectedUpazila ||
+          place.thana === selectedUpazila ||
+          place.upazila === selectedUpazila;
+        if (!matches) return false;
+      }
+
       return true;
-    }
-    const visit = getPlaceVisit(place.slug);
-    const isVisited = Boolean(visit && visit.count > 0);
+    });
+  }, [allPlaces, activeTab, selectedCategory, selectedUpazila, mounted, districtSlug, getPlaceVisit]);
 
-    // Filter by visit state
-    if (activeTab === 'VISITED' && !isVisited) return false;
-    if (activeTab === 'UNVISITED' && isVisited) return false;
-
-    // Filter by category
-    if (selectedCategory !== 'ALL' && place.category !== selectedCategory) return false;
-
-    return true;
-  });
-
-  const categories = Array.from(new Set(places.map((p) => p.category)));
+  const categories = Array.from(new Set(allPlaces.map((p) => p.category)));
 
   return (
     <section className="space-y-8 pt-4">
@@ -168,7 +224,62 @@ export function DistrictSpotTracker({
         </div>
       </div>
 
-      {/* 2. Interactive Spot Filter Toolbar */}
+      {/* 2. Upazila & Thana Directory & Quick Interactive Filter */}
+      {districtUpazilas.length > 0 && (
+        <div className="glass-card rounded-2xl p-4 sm:p-5 border border-white/10 space-y-3.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <h4 className="font-bold text-sm text-white">
+                {displayName}-এর উপজেলা ও থানা সমূহ ({districtUpazilas.length}টি)
+              </h4>
+            </div>
+            {districtUpazilas.length > 8 && (
+              <button
+                type="button"
+                onClick={() => setShowAllUpazilas(!showAllUpazilas)}
+                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+              >
+                <span>{showAllUpazilas ? 'কম দেখুন' : `সবগুলো দেখুন (+${districtUpazilas.length - 8})`}</span>
+                {showAllUpazilas ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => setSelectedUpazila('ALL')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                selectedUpazila === 'ALL'
+                  ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
+                  : 'bg-slate-900/80 border-white/5 text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              সব থানা ({districtUpazilas.length})
+            </button>
+            {(showAllUpazilas ? districtUpazilas : districtUpazilas.slice(0, 8)).map((u) => {
+              const isSelected = selectedUpazila === u.bnName;
+              return (
+                <button
+                  key={u.slug}
+                  type="button"
+                  onClick={() => setSelectedUpazila(isSelected ? 'ALL' : u.bnName)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                    isSelected
+                      ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-950/60'
+                      : 'bg-slate-900/60 border-white/5 hover:border-emerald-500/30 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  {u.bnName}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 3. Interactive Spot Filter Toolbar */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
           {/* Main Status Tabs */}
@@ -182,7 +293,7 @@ export function DistrictSpotTracker({
                   : 'glass-card text-slate-300 hover:text-white border-white/5'
               }`}
             >
-              সকল স্থান ({places.length})
+              সকল স্থান ({allPlaces.length})
             </button>
 
             <button
@@ -208,7 +319,7 @@ export function DistrictSpotTracker({
               }`}
             >
               <Circle className="w-3.5 h-3.5 text-slate-400" />
-              <span>বাকি আছে ({places.length - stats.visitedPlaces})</span>
+              <span>বাকি আছে ({allPlaces.length - stats.visitedPlaces})</span>
             </button>
           </div>
 
@@ -244,7 +355,7 @@ export function DistrictSpotTracker({
           )}
         </div>
 
-        {/* 3. Spots Grid with Interactive +/- Steppers */}
+        {/* 4. Spots Grid with Interactive +/- Steppers */}
         {filteredPlaces.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlaces.map((place) => (
@@ -262,15 +373,18 @@ export function DistrictSpotTracker({
               কোনো স্থান পাওয়া যায়নি
             </h4>
             <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
-              আপনার ফিল্টার অনুযায়ী কোনো স্থান খুঁজে পাওয়া যায়নি। ফিল্টার পরিবর্তন করে দেখুন।
+              {selectedUpazila !== 'ALL'
+                ? `"${selectedUpazila}" থানায় এখনো কোনো পর্যটন স্পট যুক্ত নেই।`
+                : 'আপনার ফিল্টার অনুযায়ী কোনো স্থান খুঁজে পাওয়া যায়নি।'}
             </p>
             <button
               type="button"
               onClick={() => {
                 setActiveTab('ALL');
                 setSelectedCategory('ALL');
+                setSelectedUpazila('ALL');
               }}
-              className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold"
+              className="px-4 py-2 rounded-xl btn-glitch bg-emerald-600 text-white text-xs font-semibold"
             >
               ফিল্টার রিসেট করুন
             </button>
@@ -278,14 +392,14 @@ export function DistrictSpotTracker({
         )}
       </div>
 
-      {/* 4. Social Share Card Modal */}
+      {/* 5. Social Share Card Modal */}
       <DistrictShareCardModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         districtName={districtName}
         districtBnName={districtBnName}
         districtSlug={districtSlug}
-        places={places}
+        places={allPlaces}
       />
     </section>
   );

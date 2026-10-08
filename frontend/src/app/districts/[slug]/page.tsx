@@ -8,6 +8,7 @@ import { ApiClient, PlaceCategory } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
 import { useMounted } from '@/hooks/useMounted';
 import { DistrictSpotTracker } from '@/components/districts/DistrictSpotTracker';
+import { getDistrictUpazilas } from '@/components/map/upazilaMetadata';
 import {
   MapPin,
   ChevronRight,
@@ -119,12 +120,17 @@ export default function DistrictDetailPage({
 
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2.5">
                     <span className="px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300">
                       {district.division.name} Division
                     </span>
+                    {getDistrictUpazilas(district.slug).length > 0 && (
+                      <span className="px-3 py-1 rounded-full bg-slate-900/80 border border-white/10 text-xs font-semibold text-slate-300">
+                        🏛️ {getDistrictUpazilas(district.slug).length}টি উপজেলা ও থানা
+                      </span>
+                    )}
                     {district.bnName && (
-                      <span className="text-xl sm:text-2xl font-bold text-slate-300 font-sans">
+                      <span className="text-xl sm:text-2xl font-bold text-slate-300 font-sans ml-1">
                         {district.bnName}
                       </span>
                     )}

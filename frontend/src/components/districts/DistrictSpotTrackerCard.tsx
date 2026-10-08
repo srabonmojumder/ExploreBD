@@ -7,6 +7,7 @@ import { Place } from '@/lib/api-client';
 import { useTravelStore } from '@/stores/useTravelStore';
 import { useMounted } from '@/hooks/useMounted';
 import { CategoryBadge } from '@/components/places/CategoryBadge';
+import { resolvePlaceUpazila } from '@/components/map/upazilaMetadata';
 import { Check, Plus, Minus, MapPin, Eye, Sparkles } from 'lucide-react';
 
 interface DistrictSpotTrackerCardProps {
@@ -21,6 +22,7 @@ export function DistrictSpotTrackerCard({
   const mounted = useMounted();
   const { getPlaceVisit, incrementVisit, decrementVisit, recordVisit } = useTravelStore();
 
+  const upazilaLabel = resolvePlaceUpazila(place, districtSlug);
   const visit = mounted ? getPlaceVisit(place.slug) : undefined;
   const isVisited = Boolean(visit && visit.count > 0);
   const visitCount = visit ? visit.count : 0;
@@ -126,6 +128,12 @@ export function DistrictSpotTrackerCard({
               </span>
             )}
           </div>
+          {upazilaLabel && (
+            <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-500/25 text-[11px] font-semibold text-emerald-300">
+              <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
+              <span>{upazilaLabel}</span>
+            </div>
+          )}
           <p className="text-xs text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">
             {place.description}
           </p>
