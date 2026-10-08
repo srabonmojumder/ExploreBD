@@ -50,12 +50,16 @@ export default function TravelTrackerPage() {
 
   const [selectedDivision, setSelectedDivision] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [nameInput, setNameInput] = useState('অভিযাত্রী');
+  const [nameInput, setNameInput] = useState('');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     if (mounted) {
-      setNameInput(travelerName);
+      if (travelerName && travelerName !== 'ভ্রমণপিপাসু' && travelerName !== 'অভিযাত্রী') {
+        setNameInput(travelerName);
+      } else {
+        setNameInput('');
+      }
     }
   }, [mounted, travelerName]);
 
@@ -161,7 +165,7 @@ export default function TravelTrackerPage() {
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center gap-2.5 flex-1">
                 <label className="text-xs text-slate-400 font-semibold whitespace-nowrap">
-                  কার্ডের নাম:
+                  আপনার নাম:
                 </label>
                 <input
                   type="text"
@@ -170,8 +174,8 @@ export default function TravelTrackerPage() {
                     setNameInput(e.target.value);
                     setTravelerName(e.target.value);
                   }}
-                  placeholder="আপনার নাম লিখুন..."
-                  className="px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 w-full"
+                  placeholder="যেমন: তানভীর হাসান"
+                  className="px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 w-full placeholder:text-slate-500"
                   maxLength={25}
                 />
               </div>
@@ -182,7 +186,7 @@ export default function TravelTrackerPage() {
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40 transition-all hover:scale-[1.02]"
               >
                 <Share2 className="w-4 h-4 text-emerald-200" />
-                <span>ট্রাভেল কার্ড ডাউনলোড করুন</span>
+                <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার</span>
               </button>
             </div>
           </div>

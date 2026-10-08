@@ -68,12 +68,12 @@ export function calculateDistrictLevel(percentage: number): { title: string; bad
 export const useTravelStore = create<TravelStoreState>()(
   persist(
     (set, get) => ({
-      travelerName: 'ভ্রমণপিপাসু',
+      travelerName: '',
       visits: {},
       manualVisitedDistricts: {},
 
       setTravelerName: (name: string) => {
-        set({ travelerName: name.trim() || 'ভ্রমণপিপাসু' });
+        set({ travelerName: name.trim() });
       },
 
       recordVisit: (item, count = 1) => {

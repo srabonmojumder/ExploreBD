@@ -23,7 +23,9 @@ export function DistrictShareCardModal({
   places,
 }: DistrictShareCardModalProps) {
   const { travelerName, setTravelerName, getDistrictVisits } = useTravelStore();
-  const [nameInput, setNameInput] = useState(travelerName);
+  const [nameInput, setNameInput] = useState(
+    travelerName && travelerName !== 'ভ্রমণপিপাসু' && travelerName !== 'অভিযাত্রী' ? travelerName : ''
+  );
   const [isCopied, setIsCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,7 +40,9 @@ export function DistrictShareCardModal({
   const displayName = districtBnName || districtName;
 
   useEffect(() => {
-    setNameInput(travelerName);
+    if (travelerName && travelerName !== 'ভ্রমণপিপাসু' && travelerName !== 'অভিযাত্রী') {
+      setNameInput(travelerName);
+    }
   }, [travelerName]);
 
   // Draw the high-res canvas whenever modal opens or name changes
@@ -139,7 +143,7 @@ export function DistrictShareCardModal({
     // 4. User Title & District Name
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 54px "Segoe UI", Arial, sans-serif';
-    ctx.fillText(`${nameInput || 'ভ্রমণপিপাসু'}-এর`, 80, 240);
+    ctx.fillText(`${nameInput || (travelerName && travelerName !== 'ভ্রমণপিপাসু' ? travelerName : '') || 'অভিযাত্রী'}-এর`, 80, 240);
 
     const gradTitle = ctx.createLinearGradient(80, 0, 700, 0);
     gradTitle.addColorStop(0, '#34d399');
@@ -352,8 +356,8 @@ explorebd.com/districts/${districtSlug}`;
                 setNameInput(e.target.value);
                 setTravelerName(e.target.value);
               }}
-              placeholder="আপনার নাম লিখুন..."
-              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500"
+              placeholder="যেমন: তানভীর হাসান"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500 placeholder:text-slate-500"
               maxLength={25}
             />
             <span className="text-xs text-slate-400 font-mono self-end sm:self-auto">

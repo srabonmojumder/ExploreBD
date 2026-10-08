@@ -50,12 +50,14 @@ export function NationalMapShareModal({
   const manualVisitedDistricts = useTravelStore((s) => s.manualVisitedDistricts);
   const visits = useTravelStore((s) => s.visits);
 
-  const [nameInput, setNameInput] = useState(travelerName || 'অভিযাত্রী');
+  const [nameInput, setNameInput] = useState(
+    travelerName && travelerName !== 'ভ্রমণপিপাসু' && travelerName !== 'অভিযাত্রী' ? travelerName : ''
+  );
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
-    if (travelerName) {
+    if (travelerName && travelerName !== 'ভ্রমণপিপাসু' && travelerName !== 'অভিযাত্রী') {
       setNameInput(travelerName);
     }
   }, [travelerName, isOpen]);
@@ -213,7 +215,7 @@ export function NationalMapShareModal({
         {/* Input for Custom Traveler Name */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-950/80 p-3 rounded-2xl border border-white/5">
           <label className="text-xs font-semibold text-slate-300 whitespace-nowrap pl-1">
-            কার্ডের জন্য নাম:
+            আপনার নাম:
           </label>
           <input
             type="text"
@@ -222,8 +224,8 @@ export function NationalMapShareModal({
               setNameInput(e.target.value);
               setTravelerName(e.target.value);
             }}
-            placeholder="আপনার নাম লিখুন..."
-            className="flex-1 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500"
+            placeholder="যেমন: তানভীর হাসান"
+            className="flex-1 px-3.5 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 placeholder:text-slate-500"
             maxLength={25}
           />
         </div>
@@ -293,7 +295,7 @@ export function NationalMapShareModal({
             {/* Traveler Headline & Level */}
             <div className="relative z-10 text-center space-y-1">
               <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                {nameInput || 'ভ্রমণপিপাসু'} এর ভ্রমণ খতিয়ান
+                {nameInput || (travelerName && travelerName !== 'ভ্রমণপিপাসু' ? travelerName : '') || 'অভিযাত্রী'} এর ভ্রমণ খতিয়ান
               </h3>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs text-emerald-300 font-semibold">
                 <span>{level.badge}</span>
