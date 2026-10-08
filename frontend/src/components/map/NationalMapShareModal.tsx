@@ -1,29 +1,28 @@
 'use client';
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { toPng } from 'html-to-image';
 import { Manchitro, resolveDistrict, DISTRICTS, ValidDistrict } from 'manchitro';
 import { District } from '@/lib/api-client';
 import { useTravelStore, calculateDistrictLevel } from '@/stores/useTravelStore';
-import { useAppStore } from '@/stores/useAppStore';
+import { DISTRICT_MAP_COORDINATES } from '@/components/map/districtCoordinates';
+import {
+  STATIC_SLUG_TO_CANONICAL,
+  STATIC_SLUG_TO_DISTRICT,
+} from '@/components/map/districtMetadata';
 import {
   X,
   Download,
-  Share2,
   Copy,
   Check,
   Sparkles,
-  Trophy,
   Compass,
-  MapPin,
-  Flame,
-  Layers,
 } from 'lucide-react';
 
 interface NationalMapShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  districts: District[];
+  districts?: District[];
   selectedDivisionSlug?: string | null;
 }
 
@@ -42,78 +41,77 @@ export function NationalMapShareModal({
   isOpen,
   onClose,
   districts,
-  selectedDivisionSlug: propSelectedDivisionSlug,
 }: NationalMapShareModalProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const { travelerName, setTravelerName, getVisitedDistrictSlugs, getTotalVisitsCount } =
-    useTravelStore();
-  const appSelectedDivisionSlug = useAppStore((state) => state.selectedDivisionSlug);
 
-  const activeDivisionSlug = propSelectedDivisionSlug ?? appSelectedDivisionSlug;
+  // Directly subscribe to reactive state slices from TravelStore
+  const travelerName = useTravelStore((s) => s.travelerName);
+  const setTravelerName = useTravelStore((s) => s.setTravelerName);
+  const manualVisitedDistricts = useTravelStore((s) => s.manualVisitedDistricts);
+  const visits = useTravelStore((s) => s.visits);
 
-  const [nameInput, setNameInput] = useState(travelerName || 'ভ্রমণপিপাসু');
+  const [nameInput, setNameInput] = useState(travelerName || 'অভিযাত্রী');
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    if (travelerName) {
+      setNameInput(travelerName);
+    }
+  }, [travelerName, isOpen]);
 
   // All 64 canonical districts so Manchitro renders every district cleanly
   const allCanonicalDistricts = useMemo(() => {
     return [...DISTRICTS] as ValidDistrict[];
   }, []);
 
-  // Map district slugs to canonical manchitro names
-  const { slugToCanonical, visitedSlugs, divisionCanonicalMap } = useMemo(() => {
-    const slugMap = new Map<string, ValidDistrict>();
-    const divCanonicalMap = new Map<string, ValidDistrict[]>();
-
-    districts.forEach((d) => {
-      const canonical = resolveDistrict(d.name) || resolveDistrict(d.slug);
-      if (canonical) {
-        slugMap.set(d.slug, canonical);
-        const divSlug = d.division?.slug || 'other';
-        if (!divCanonicalMap.has(divSlug)) {
-          divCanonicalMap.set(divSlug, []);
-        }
-        divCanonicalMap.get(divSlug)!.push(canonical);
+  // Real-time visited district slugs derived reactively from store state
+  const visitedSlugs = useMemo(() => {
+    const set = new Set<string>();
+    Object.entries(manualVisitedDistricts || {}).forEach(([slug, val]) => {
+      if (val) set.add(slug);
+    });
+    Object.values(visits || {}).forEach((item) => {
+      if (item && item.count > 0 && item.districtSlug) {
+        set.add(item.districtSlug);
       }
     });
+    return Array.from(set);
+  }, [manualVisitedDistricts, visits]);
 
-    const vSlugs = getVisitedDistrictSlugs();
-    return {
-      slugToCanonical: slugMap,
-      visitedSlugs: vSlugs,
-      divisionCanonicalMap: divCanonicalMap,
-    };
-  }, [districts, getVisitedDistrictSlugs]);
-
-  // Active visited canonical names for Manchitro
+  // Active visited canonical names for Manchitro & Pins with 100% static & dynamic coverage
   const visitedCanonicalDistricts = useMemo(() => {
     const result: ValidDistrict[] = [];
     visitedSlugs.forEach((slug) => {
-      const canon = slugToCanonical.get(slug);
+      let canon = STATIC_SLUG_TO_CANONICAL.get(slug);
+      if (!canon && districts) {
+        const found = districts.find((d) => d.slug === slug);
+        if (found) {
+          canon = resolveDistrict(found.name) || resolveDistrict(found.slug);
+        }
+      }
+      if (!canon) {
+        canon = resolveDistrict(slug);
+      }
       if (canon && !result.includes(canon)) {
         result.push(canon);
       }
     });
     return result;
-  }, [visitedSlugs, slugToCanonical]);
+  }, [visitedSlugs, districts]);
 
-  // Canonical districts of the currently selected division (if any)
-  const activeDivisionCanonicalNames = useMemo(() => {
-    if (!activeDivisionSlug) return [];
-    return divisionCanonicalMap.get(activeDivisionSlug) || [];
-  }, [activeDivisionSlug, divisionCanonicalMap]);
-
-  const visitedCount = visitedSlugs.length;
+  const visitedCount = visitedCanonicalDistricts.length;
   const percentage = Math.round((visitedCount / 64) * 100);
-  const totalVisitsCount = getTotalVisitsCount();
   const level = calculateDistrictLevel(percentage);
 
-  // Calculate division counts
+  // Calculate division counts accurately using full district definitions
   const divisionCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    districts.forEach((d) => {
-      if (visitedSlugs.includes(d.slug) && d.division?.slug) {
-        counts[d.division.slug] = (counts[d.division.slug] || 0) + 1;
+    visitedSlugs.forEach((slug) => {
+      const d = districts?.find((x) => x.slug === slug) || STATIC_SLUG_TO_DISTRICT.get(slug);
+      const divSlug = d?.division?.slug;
+      if (divSlug) {
+        counts[divSlug] = (counts[divSlug] || 0) + 1;
       }
     });
     return counts;
@@ -198,12 +196,13 @@ export function NationalMapShareModal({
                 বাংলাদেশ ভ্রমণ ম্যাপ কার্ড
               </h2>
               <p className="text-xs text-slate-400">
-                সম্পূর্ণ বাংলাদেশ ম্যাপে আপনার ঘুরে দেখা জেলাসমূহ সহ HD ফটো কার্ড
+                সম্পূর্ণ বাংলাদেশ ম্যাপে আপনার ঘুরে দেখা জেলাসমূহ ও পিন সহ HD ফটো কার্ড
               </p>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
           >
@@ -233,13 +232,13 @@ export function NationalMapShareModal({
         <div className="overflow-x-auto flex justify-center py-2">
           <div
             ref={cardRef}
-            className="w-[340px] sm:w-[430px] max-w-full rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-2xl text-white relative space-y-4"
+            className="w-[340px] sm:w-[440px] max-w-full rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-emerald-500/40 shadow-2xl text-white relative space-y-4"
           >
             {/* Scoped CSS for full map clarity in exported image */}
             <style>{`
               .share-card-map-svg g path {
                 fill: #1e293b !important;
-                stroke: rgba(255, 255, 255, 0.38) !important;
+                stroke: rgba(255, 255, 255, 0.25) !important;
                 stroke-width: 1.2px !important;
                 opacity: 1 !important;
               }
@@ -249,33 +248,15 @@ export function NationalMapShareModal({
                 .map(
                   (name) => `
                 .share-card-map-svg g[aria-label="${name}"] path {
-                  fill: #10b981 !important;
-                  stroke: #ffffff !important;
+                  fill: #059669 !important;
+                  stroke: #34d399 !important;
                   stroke-width: 2px !important;
                   opacity: 1 !important;
-                  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.9)) !important;
+                  filter: drop-shadow(0 0 6px rgba(5, 150, 105, 0.8)) !important;
                 }
               `
                 )
                 .join('\n')}
-
-              /* Selected division accent outline (if active) */
-              ${
-                activeDivisionSlug
-                  ? activeDivisionCanonicalNames
-                      .map((name) => {
-                        const isVisited = visitedCanonicalDistricts.includes(name);
-                        return `
-                  .share-card-map-svg g[aria-label="${name}"] path {
-                    stroke: ${isVisited ? '#34d399' : '#38bdf8'} !important;
-                    stroke-width: 2.4px !important;
-                    ${!isVisited ? 'fill: #0891b2 !important;' : ''}
-                  }
-                `;
-                      })
-                      .join('\n')
-                  : ''
-              }
             `}</style>
 
             {/* Ambient glow in card */}
@@ -334,22 +315,63 @@ export function NationalMapShareModal({
               </div>
             </div>
 
-            {/* The FULL Bangladesh SVG Map Frame */}
-            <div className="relative z-10 w-full max-w-[290px] sm:max-w-[330px] mx-auto aspect-[1555/2140] flex items-center justify-center p-2.5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800 shadow-inner">
-              <Manchitro
-                items={allCanonicalDistricts}
-                className="w-full h-full flex items-center justify-center relative pointer-events-none"
-                svgClassName="share-card-map-svg w-full h-auto drop-shadow-md"
-                colors={{
-                  base: '#1e293b',
-                  active: '#10b981',
-                  selected: '#10b981',
-                  stroke: 'rgba(255, 255, 255, 0.38)',
-                  selectedStroke: '#ffffff',
-                }}
-                renderSelected={() => null}
-                renderDebug={() => null}
-              />
+            {/* The FULL Bangladesh SVG Map Frame with Pins */}
+            <div className="relative z-10 w-full max-w-[290px] sm:max-w-[340px] mx-auto aspect-[1555/2140] flex items-center justify-center p-2 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-800 shadow-inner overflow-hidden">
+              <div className="relative w-full h-full flex items-center justify-center">
+                <Manchitro
+                  items={allCanonicalDistricts}
+                  className="w-full h-full flex items-center justify-center relative pointer-events-none"
+                  svgClassName="share-card-map-svg w-full h-auto drop-shadow-md"
+                  colors={{
+                    base: '#1e293b',
+                    active: '#059669',
+                    selected: '#059669',
+                    stroke: 'rgba(255, 255, 255, 0.25)',
+                    selectedStroke: '#34d399',
+                  }}
+                  renderSelected={() => null}
+                  renderDebug={() => null}
+                />
+
+                {/* SVG Pin Overlay Layer matching the interactive tracker map */}
+                <svg
+                  viewBox="0 0 1555 2140"
+                  className="absolute inset-0 w-full h-full pointer-events-none z-20"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <defs>
+                    <filter id="modal-card-pin-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                      <feDropShadow dx="0" dy="5" stdDeviation="4" floodColor="#000000" floodOpacity="0.8" />
+                    </filter>
+                  </defs>
+                  {visitedCanonicalDistricts.map((canonicalName) => {
+                    const coords = DISTRICT_MAP_COORDINATES[canonicalName];
+                    if (!coords) return null;
+                    return (
+                      <g
+                        key={`modal-card-pin-${canonicalName}`}
+                        transform={`translate(${coords.x}, ${coords.y})`}
+                      >
+                        {/* Ground Shadow */}
+                        <ellipse cx="0" cy="0" rx="16" ry="6" fill="rgba(0, 0, 0, 0.55)" />
+
+                        {/* Crisp Teardrop Map Pin Marker */}
+                        <g transform="translate(-25, -72)">
+                          <path
+                            d="M25 0 C11.19 0 0 11.19 0 25 C0 44 25 72 25 72 C25 72 50 44 50 25 C50 11.19 38.81 0 25 0 Z"
+                            fill="#ef4444"
+                            stroke="#ffffff"
+                            strokeWidth="4"
+                            filter="url(#modal-card-pin-shadow)"
+                          />
+                          <circle cx="25" cy="25" r="11" fill="#ffffff" />
+                          <circle cx="25" cy="25" r="6" fill="#b91c1c" />
+                        </g>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
             </div>
 
             {/* Clear Legend Bar */}
@@ -405,6 +427,7 @@ export function NationalMapShareModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Download PNG Button */}
             <button
+              type="button"
               onClick={handleDownload}
               disabled={isDownloading}
               className="w-full py-3 px-4 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2 border border-emerald-400/40 disabled:opacity-50"
@@ -415,6 +438,7 @@ export function NationalMapShareModal({
 
             {/* Copy Image Button */}
             <button
+              type="button"
               onClick={handleCopy}
               className="w-full py-3 px-4 rounded-lg btn-glitch bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold text-xs flex items-center justify-center gap-2"
             >
@@ -436,12 +460,14 @@ export function NationalMapShareModal({
           <div className="flex items-center justify-center gap-3 pt-1">
             <span className="text-xs text-slate-400 font-medium">সরাসরি শেয়ার করুন:</span>
             <button
+              type="button"
               onClick={handleShareWhatsApp}
               className="px-3.5 py-1.5 rounded-lg btn-glitch bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-1.5"
             >
               <span>WhatsApp</span>
             </button>
             <button
+              type="button"
               onClick={handleShareFacebook}
               className="px-3.5 py-1.5 rounded-lg btn-glitch bg-blue-950/80 hover:bg-blue-900 border border-blue-500/30 text-blue-300 text-xs font-semibold flex items-center gap-1.5"
             >
