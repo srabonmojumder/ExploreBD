@@ -41,27 +41,18 @@ export function Navbar() {
   const navLinks = [
     {
       name: 'ভ্রমণ ট্র্যাকার',
-      desc: 'আপনার ৬৪ জেলার ভ্রমণ মানচিত্র ও লগ',
       href: '/tracker',
       icon: Globe2,
     },
     {
-      name: 'স্পটসমূহ',
-      desc: 'জনপ্রিয় পর্যটন স্পট ও বিস্তারিত গাইড',
+      name: 'দর্শনীয় স্থান',
       href: '/places',
       icon: Compass,
     },
     {
       name: '৬৪ জেলা',
-      desc: 'বিভাগ ও জেলাভিত্তিক পূর্ণাঙ্গ তালিকা',
       href: '/districts',
       icon: MapPin,
-    },
-    {
-      name: 'বিভাগসমূহ',
-      desc: 'বিভাগ অনুযায়ী অন্বেষণ ও স্পট সংখ্যা',
-      href: '/#divisions',
-      icon: Layers,
     },
   ];
 
@@ -110,26 +101,18 @@ export function Navbar() {
               })}
             </nav>
 
-            {/* Desktop Actions & Live Progress Badge */}
+            {/* Desktop Actions - Single Clear CTA Button */}
             <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
               <Link
                 href="/tracker"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300 transition-colors whitespace-nowrap"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-sm font-bold text-white shadow-lg shadow-emerald-950/60 flex items-center gap-2 border border-emerald-400/30 transition-all hover:scale-[1.02]"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <Globe2 className="w-4 h-4 text-emerald-200" />
                 {visitedCount > 0 ? (
-                  <span>{visitedCount}/৬৪ জেলা সম্পন্ন ✨</span>
+                  <span>{visitedCount}/৬৪ জেলা সম্পন্ন</span>
                 ) : (
-                  <span>বাংলাদেশ লাইভ 🇧🇩</span>
+                  <span>ভ্রমণ ট্র্যাকার</span>
                 )}
-              </Link>
-
-              <Link
-                href="/tracker"
-                className="px-4 py-2 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-sm font-bold text-white shadow-lg shadow-emerald-950/60 flex items-center gap-2 border border-emerald-400/30 whitespace-nowrap"
-              >
-                <Compass className="w-4 h-4" />
-                <span>অন্বেষণ শুরু করুন</span>
               </Link>
             </div>
 
@@ -148,7 +131,7 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* Right-Side Mobile Drawer with Dark Backdrop */}
+      {/* Right-Side Mobile Drawer */}
       <div
         className={`fixed inset-0 z-50 transition-opacity duration-300 lg:hidden ${
           isMobileMenuOpen
@@ -158,142 +141,89 @@ export function Navbar() {
         aria-modal="true"
         role="dialog"
       >
-        {/* Backdrop (Click to close) */}
+        {/* Backdrop */}
         <div
           className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
 
-        {/* Right-Side Sliding Drawer Container */}
+        {/* Sliding Drawer */}
         <div
-          className={`fixed inset-y-0 right-0 z-50 w-full max-w-sm sm:max-w-md bg-slate-950/98 backdrop-blur-2xl border-l border-white/10 shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-out ${
+          className={`fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-slate-950/98 backdrop-blur-2xl border-l border-white/10 shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-out ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          {/* Drawer Header with Close Button */}
+          {/* Header */}
           <div className="flex-shrink-0 border-b border-white/10 bg-slate-900/80 px-5 h-20 flex items-center justify-between">
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-3"
             >
-              <div className="relative w-11 h-11 rounded-xl overflow-hidden border border-emerald-500/50 shadow-md bg-slate-900 flex-shrink-0">
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-emerald-500/50 shadow-md bg-slate-900 flex-shrink-0">
                 <Image
                   src="/logo.jpg"
                   alt="ExploreBD Logo"
                   fill
-                  sizes="44px"
+                  sizes="40px"
                   className="object-cover"
                 />
               </div>
               <div>
-                <div className="flex items-center gap-1 font-black text-xl text-white leading-none">
+                <div className="flex items-center gap-1 font-black text-lg text-white leading-none">
                   <span>Explore</span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">BD</span>
                 </div>
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mt-1">
-                  ভ্রমণ প্ল্যাটফর্ম
+                <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                  ৬৪ জেলা ভ্রমণ গাইড
                 </p>
               </div>
             </Link>
 
-            {/* Prominent Close Icon Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 border border-white/10 hover:border-rose-500/40 transition-colors flex items-center justify-center gap-1.5"
+              className="p-2 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 border border-white/10 transition-colors"
               aria-label="মেনু বন্ধ করুন"
             >
-              <span className="text-xs font-semibold text-slate-300">বন্ধ করুন</span>
-              <X className="w-5 h-5 text-rose-400" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Drawer Content Body */}
-          <div className="flex-1 px-5 py-6 space-y-5">
-            {/* Progress Tracker Card */}
-            <div className="p-4 rounded-xl glass-card border border-emerald-500/30 bg-emerald-950/30 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 flex-shrink-0">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-emerald-300">
-                    {visitedCount > 0 ? `${visitedCount}/৬৪ জেলা সম্পন্ন` : 'ভ্রমণ মানচিত্র শুরু করুন'}
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    {visitedCount > 0
-                      ? 'আপনার ভ্রমণের রিয়েল-টাইম অগ্রগতি'
-                      : 'বাংলাদেশের জেলাসমূহ চিহ্নিত করুন'}
-                  </p>
-                </div>
-              </div>
-              <Link
-                href="/tracker"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition-colors flex-shrink-0"
-              >
-                ম্যাপ
-              </Link>
-            </div>
-
-            {/* Navigation Links */}
-            <div className="space-y-2">
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
-                প্রধান মেনু
-              </p>
-              <nav className="flex flex-col space-y-2">
-                {navLinks.map((link) => {
-                  const Icon = link.icon;
-                  return (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between p-3.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-emerald-500/30 text-slate-200 hover:text-white transition-all group"
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors flex-shrink-0">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold block text-white">
-                            {link.name}
-                          </span>
-                          <span className="text-xs text-slate-400 block mt-0.5">
-                            {link.desc}
-                          </span>
-                        </div>
+          {/* Links */}
+          <div className="flex-1 px-5 py-6 space-y-4">
+            <nav className="flex flex-col space-y-2">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-3.5 rounded-xl bg-white/5 hover:bg-emerald-950/40 border border-white/5 hover:border-emerald-500/30 text-white font-semibold transition-all group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors" />
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
+                      <span className="text-sm font-semibold">{link.name}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors" />
+                  </Link>
+                );
+              })}
+            </nav>
 
-            {/* Action Buttons */}
-            <div className="pt-2 space-y-2.5">
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
-                কুইক অ্যাকশন
-              </p>
+            {/* Single Primary Action in mobile menu */}
+            <div className="pt-2">
               <Link
                 href="/tracker"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-950/60 transition-colors"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 transition-all"
               >
                 <Compass className="w-4 h-4" />
-                <span>ইন্টারেক্টিভ মানচিত্র ও ট্র্যাকার</span>
-              </Link>
-
-              <Link
-                href="/districts"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-lg btn-glitch bg-slate-900 border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-white text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
-              >
-                <MapPin className="w-4 h-4 text-emerald-400" />
-                <span>৬৪ জেলার তালিকা দেখুন</span>
+                <span>ম্যাপে ভ্রমণ ট্র্যাক করুন</span>
               </Link>
             </div>
           </div>

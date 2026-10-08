@@ -77,21 +77,21 @@ export function DivisionPreview() {
     <section id="divisions" className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Discover Bangladesh</span>
+            <span>বিভাগভিত্তিক অন্বেষণ</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
-            Explore All 8 Divisions
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-1">
+            বাংলাদেশের ৮টি বিভাগ
           </h2>
           <p className="text-sm text-slate-400 mt-1">
-            From the deep mangroves of Sundarbans to the rolling green tea hills of Sylhet
+            সুন্দরবনের শ্বাসমূল থেকে শুরু করে সিলেটের সবুজ চা বাগান
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-300 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-white/10 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-300 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-white/10 shadow-sm">
           <MapPin className="w-3.5 h-3.5 text-emerald-400" />
-          <span>64 Districts Ready to Explore</span>
+          <span>মোট ৬৪টি জেলা</span>
         </div>
       </div>
 
@@ -117,17 +117,17 @@ export function DivisionPreview() {
                 {/* Top Badge: District Count */}
                 <div className="absolute top-3 right-3">
                   <span className="px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/15 text-[11px] font-bold text-emerald-300 shadow-md">
-                    {div.districts} Districts
+                    {div.districts}টি জেলা
                   </span>
                 </div>
 
                 {/* Bottom Title on Image */}
                 <div className="absolute bottom-3 left-3 right-3 flex items-baseline justify-between">
                   <h3 className="font-extrabold text-xl text-white group-hover:text-emerald-300 transition-colors">
-                    {div.name}
-                  </h3>
-                  <span className="text-sm font-semibold text-slate-300">
                     {div.bnName}
+                  </h3>
+                  <span className="text-xs font-medium text-slate-300">
+                    {div.name}
                   </span>
                 </div>
               </div>

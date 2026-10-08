@@ -103,15 +103,14 @@ export default function TravelTrackerPage() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              শুধুমাত্র জেলা টিক নয়—প্রতিটি জেলার ভেতরে কোন কোন ঝর্ণা, পার্ক, লেক বা পাহাড়ে আপনি
-              গিয়েছেন এবং <strong>কত বার গিয়েছেন</strong>, তা ট্র্যাক করুন ও শেয়ার করুন নিজের ভ্রমণ খতিয়ান!
+              মানচিত্রের যেকোনো জেলায় ক্লিক করে <strong>ঘুরেছি</strong> মার্ক করুন। আপনার ভ্রমণের স্কোর স্বয়ংক্রিয়ভাবে হিসাব হবে এবং আপনি সুন্দর ট্রাভেল কার্ড ডাউনলোড করতে পারবেন!
             </p>
 
             {/* Custom Name Field & Share Button */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center gap-2.5 flex-1">
                 <label className="text-xs text-slate-400 font-semibold whitespace-nowrap">
-                  আপনার নাম:
+                  কার্ডের নাম:
                 </label>
                 <input
                   type="text"
@@ -129,10 +128,10 @@ export default function TravelTrackerPage() {
               <button
                 type="button"
                 onClick={() => setIsShareModalOpen(true)}
-                className="px-5 py-2.5 rounded-lg btn-glitch bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40 transition-all hover:scale-[1.02]"
               >
                 <Share2 className="w-4 h-4 text-emerald-200" />
-                <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার</span>
+                <span>ট্রাভেল কার্ড ডাউনলোড করুন</span>
               </button>
             </div>
           </div>
@@ -189,17 +188,14 @@ export default function TravelTrackerPage() {
               <span>ইন্টারেক্টিভ বাংলাদেশ ভ্রমণ মানচিত্র</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-              যে জেলাগুলোতে আপনি ভ্রমণ করেছেন তা ম্যাপে সবুজ রঙে হাইলাইট হবে। যে কোনো জেলায় ক্লিক করে সরাসরি ঘুরেছি চিহ্নিত করুন।
+              যে জেলাগুলোতে গিয়েছেন তা ম্যাপে সবুজ হবে। যেকোনো জেলায় ক্লিক করে স্ট্যাটাস পরিবর্তন করুন।
             </p>
           </div>
 
-          <button
-            onClick={() => setIsShareModalOpen(true)}
-            className="px-4 py-2 rounded-lg btn-glitch bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold text-xs flex items-center gap-2 shrink-0 self-start sm:self-auto"
-          >
-            <Share2 className="w-4 h-4 text-emerald-400" />
-            <span>ম্যাপ কার্ড ডাউনলোড (PNG)</span>
-          </button>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-xs font-semibold text-emerald-300 self-start sm:self-auto">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>👆 যে কোনো জেলায় ক্লিক করুন</span>
+          </div>
         </div>
 
         <BangladeshInteractiveMap
