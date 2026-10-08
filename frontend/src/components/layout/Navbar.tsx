@@ -68,7 +68,7 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16 sm:h-[68px] gap-4">
             {/* Brand Logo - Clean, border removed, modern sleek typography */}
             <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-              <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-md shadow-black/40 group-hover:scale-105 transition-transform flex-shrink-0">
+              <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden shadow-md shadow-black/40 group-hover:scale-105 transition-transform flex-shrink-0">
                 <Image
                   src="/logo.jpg"
                   alt="ExploreBD Logo"
@@ -98,11 +98,10 @@ export function Navbar() {
                   <Link
                     key={link.name}
                     href={link.href}
-                    className={`relative flex items-center gap-2 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                      isActive
-                        ? 'text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 shadow-sm shadow-emerald-950/40'
-                        : 'text-slate-300 hover:text-white hover:bg-white/[0.06] border border-transparent'
-                    }`}
+                    className={`relative flex items-center gap-2 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${isActive
+                      ? 'text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 shadow-sm shadow-emerald-950/40'
+                      : 'text-slate-300 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                      }`}
                   >
                     <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
                     <span>{link.name}</span>
@@ -118,7 +117,7 @@ export function Navbar() {
             <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
               <Link
                 href="/tracker"
-                className="group relative px-4 sm:px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-emerald-950/70 border border-emerald-400/30 flex items-center gap-2 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                className="group relative px-4 sm:px-5 py-2 rounded-full btn-glitch bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-emerald-950/70 border border-emerald-400/30 flex items-center gap-2 transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
                 <Globe2 className="w-4 h-4 text-emerald-200 group-hover:rotate-12 transition-transform" />
                 {visitedCount > 0 ? (
@@ -146,11 +145,10 @@ export function Navbar() {
 
       {/* Modern Right-Side Mobile Drawer */}
       <div
-        className={`fixed inset-0 z-50 transition-opacity duration-300 lg:hidden ${
-          isMobileMenuOpen
-            ? 'opacity-100 pointer-events-auto'
-            : 'opacity-0 pointer-events-none'
-        }`}
+        className={`fixed inset-0 z-50 transition-opacity duration-300 lg:hidden ${isMobileMenuOpen
+          ? 'opacity-100 pointer-events-auto'
+          : 'opacity-0 pointer-events-none'
+          }`}
         aria-modal="true"
         role="dialog"
       >
@@ -163,9 +161,8 @@ export function Navbar() {
 
         {/* Sliding Drawer */}
         <div
-          className={`fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-slate-950/95 backdrop-blur-2xl border-l border-white/[0.08] shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-out ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
+          className={`fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-slate-950/95 backdrop-blur-2xl border-l border-white/[0.08] shadow-2xl flex flex-col justify-between overflow-y-auto transition-transform duration-300 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
         >
           {/* Drawer Header - Clean without logo border */}
           <div className="flex-shrink-0 border-b border-white/[0.08] bg-slate-900/50 px-5 h-16 sm:h-[68px] flex items-center justify-between">
@@ -215,25 +212,22 @@ export function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between p-3.5 rounded-xl transition-all group ${
-                      isActive
-                        ? 'bg-emerald-500/15 border border-emerald-500/30 text-white'
-                        : 'bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] text-slate-200'
-                    }`}
+                    className={`flex items-center justify-between p-3.5 rounded-xl transition-all group ${isActive
+                      ? 'bg-emerald-500/15 border border-emerald-500/30 text-white'
+                      : 'bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] text-slate-200'
+                      }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
-                        isActive
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-slate-900 border border-white/[0.08] text-slate-400 group-hover:text-emerald-400'
-                      }`}>
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${isActive
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-slate-900 border border-white/[0.08] text-slate-400 group-hover:text-emerald-400'
+                        }`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <span className="text-sm font-semibold">{link.name}</span>
                     </div>
-                    <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
-                      isActive ? 'text-emerald-400' : 'text-slate-500'
-                    }`} />
+                    <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${isActive ? 'text-emerald-400' : 'text-slate-500'
+                      }`} />
                   </Link>
                 );
               })}
@@ -244,7 +238,7 @@ export function Navbar() {
               <Link
                 href="/tracker"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/60 border border-emerald-400/30 transition-all"
+                className="w-full py-3.5 rounded-xl btn-glitch bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/60 border border-emerald-400/30 transition-all"
               >
                 <Compass className="w-4 h-4" />
                 <span>আপনার ম্যাপ তৈরি করুন</span>

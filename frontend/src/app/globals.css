@@ -52,15 +52,13 @@
 .btn-glitch {
   position: relative !important;
   overflow: hidden !important;
-  border-radius: 0.5rem !important; /* Clean rounded-lg (8px), no bubbly radius */
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease !important;
-  transform: none !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
 }
 
 .btn-glitch:hover,
 .btn-glitch:active,
 .btn-glitch:focus {
-  transform: none !important; /* Strictly NO transform scale jumping on hover */
+  /* Retain smooth hover behavior */
 }
 
 /* Glitch sweep beam across the button surface */

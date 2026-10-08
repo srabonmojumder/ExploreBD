@@ -80,7 +80,7 @@ export default function DistrictDetailPage({
             </button>
             <Link
               href="/districts"
-              className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold"
+              className="px-4 py-2 rounded-xl btn-glitch bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
             >
               Browse All Districts
             </Link>

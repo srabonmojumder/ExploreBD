@@ -184,7 +184,7 @@ export default function TravelTrackerPage() {
                 <button
                   type="button"
                   onClick={() => setIsShareModalOpen(true)}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40 transition-all hover:scale-[1.02]"
+                  className="px-5 py-2.5 rounded-xl btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 shrink-0 border border-emerald-400/40 transition-all hover:scale-[1.02]"
                 >
                   <Share2 className="w-4 h-4 text-emerald-200" />
                   <span>ম্যাপ ইমেজ ডাউনলোড ও শেয়ার</span>

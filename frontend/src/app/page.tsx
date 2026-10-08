@@ -100,7 +100,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <Link
               href="/tracker"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-base shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2.5 border border-emerald-400/30 transition-all hover:scale-[1.02]"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl btn-glitch bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-base shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2.5 border border-emerald-400/30 transition-all hover:scale-[1.02]"
             >
               <Compass className="w-5 h-5 text-emerald-200" />
               <span>আপনার ম্যাপ তৈরি করুন</span>
@@ -109,7 +109,7 @@ export default function HomePage() {
 
             <Link
               href="/districts"
-              className="w-full sm:w-auto px-7 py-4 rounded-xl glass-card hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-sm border border-white/10 flex items-center justify-center gap-2 transition-all"
+              className="w-full sm:w-auto px-7 py-4 rounded-xl btn-glitch glass-card hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-sm border border-white/10 flex items-center justify-center gap-2 transition-all"
             >
               <MapPin className="w-4 h-4 text-emerald-400" />
               <span>৬৪ জেলা অন্বেষণ</span>

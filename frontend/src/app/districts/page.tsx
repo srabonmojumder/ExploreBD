@@ -112,7 +112,7 @@ function DistrictsContent() {
           <button
             type="button"
             onClick={() => refetch()}
-            className="px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700"
+            className="px-4 py-2 rounded-xl btn-glitch bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700"
           >
             Try Again
           </button>
@@ -133,7 +133,7 @@ function DistrictsContent() {
               setSelectedDivision('');
               setSearchQuery('');
             }}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
+            className="px-4 py-2 rounded-xl btn-glitch bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
           >
             Reset Filters
           </button>
